@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<%- include('../partials/head'); %>
+</head>
+
+<body>
+
+	<header>
+		<%- include('../partials/header'); %>
+	</header>
+
+	<div class="jumbotron">
+		<form name="search" action="search" method=POST>
+			<h1>Search</h1>
+			<input type="reset" \><br \>
+			First Name: <input name="fname" type="search" \><br \>
+			Last Name: <input name="lname" type="search" \><br \>
+			DOB: <input name="dob" type="date" \><br \>
+			Phone: <input name="phone" type="tel" \><br \>
+			Email: <input name="email" type="email" \><br \>
+			<input type="submit" \>
+		</form>
+	</div>
+
+	<footer>
+		<%- include('../partials/footer'); %>
+	</footer>
+</body>
+
+</html>
