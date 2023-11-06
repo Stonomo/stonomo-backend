@@ -2,12 +2,13 @@ import createError from 'http-errors';
 import express from 'express';
 import path, { join } from 'path';
 import { fileURLToPath } from 'url';
+import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import lessMiddleware from 'less-middleware';
 import logger from 'morgan';
 import mongoose from 'mongoose';
 
-import { PORT, MONGO_CONN_STR } from './config.js';
+//import { process.env.PORT, MONGO_CONN_STR } from './config.js';
 
 import * as routers from './routes.js';
 import { populateReasons } from './models/Reason.js';
@@ -64,7 +65,7 @@ app.use(function (err, req, res, next) {
 
 console.log("Connecting to Database");
 
-mongoose.connect(MONGO_CONN_STR).then(console.log('Connection success!')).catch(err => {
+mongoose.connect(process.env.MONGODB_URI).then(console.log('Connection success!')).catch(err => {
 	console.log('Failed to connect to MongoDB');
 	console.log(err);
 });
@@ -75,8 +76,8 @@ await populateReasons();
 
 console.log("Opening Ports");
 
-app.listen(PORT, () => {
-	console.log("Server listening on port:", PORT);
+app.listen(process.env.PORT, () => {
+	console.log("Server listening on port:", process.env.PORT);
 });
 
 export default app;
