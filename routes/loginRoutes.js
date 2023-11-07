@@ -12,18 +12,16 @@ router.post('/login', async (req, res) => {
 		let user = await getUserByUsername(req.body.username);
 
 		if (!user) {
-			res.status(401).json({ message: "Invalid Credentials" });
+			return res.status(401).json({ message: "Invalid Credentials" });
 		}
 
 		// Compare passwords
-		bcrypt.compare(req.body.password, user.passHash, (err, result) => {
-			if (result) {
-				return res.status(200).json({ message: "User Logged in Successfully" });
-			}
-			else {
-				return res.status(401).json({ message: "Invalid Credentials" });
-			}
-		});
+		const result = await bcrypt.compare(req.body.password, user.passHash);
+		if (result) {
+			// TODO: add session persistence
+			return res.status(200).json({ message: "User Logged in Successfully" });
+		}
+		return res.status(401).json({ message: "Invalid Credentials" });
 	} catch (err) {
 		res.status(401).send(err.message);
 	}

@@ -3,6 +3,7 @@ import { User, getUserById, getUserByUsername, updateUser } from '../models/User
 import bcrypt from 'bcrypt';
 
 var router = Router();
+const saltRounds = 10;
 
 /* GET user record. */
 // TODO needs to check :auth
@@ -13,7 +14,7 @@ router.get('/:id', async (req, res) => {
 		res.send(user);
 	} catch {
 		res.status(404);
-		res.send({ error: 'user record does not exist' });
+		res.send({ error: 'User does not exist' });
 	}
 
 });
@@ -22,26 +23,24 @@ router.get('/:id', async (req, res) => {
 // TODO: needs to check :auth
 router.post('/', async (req, res) => {
 	try {
+		const hash = await bcrypt.hash(req.body.password, saltRounds);
 		let checkExists = await getUserByUsername(req.body.username);
 
 		if (checkExists) {
 			res.status(401).json({ message: "Email is already in use." });
 			return;
 		}
-		const saltRounds = 10;
-		bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
-			if (err) throw new Error('Internal Server Error');
-			const user = new User({
-				username: req.body.username,
-				passHash: hash,
-				facilityName: req.body.facilityName,
-				facilityAddress: req.body.facilityAddress,
-				facilityPhone: req.body.facilityPhone,
-				facilityEmail: req.body.facilityEmail
-			});
-			user.save().then(() => {
-				res.json({ message: "User created successfully", user });
-			});
+		if (err) throw new Error('Internal Server Error');
+		const user = new User({
+			username: req.body.username,
+			passHash: hash,
+			facilityName: req.body.facilityName,
+			facilityAddress: req.body.facilityAddress,
+			facilityPhone: req.body.facilityPhone,
+			facilityEmail: req.body.facilityEmail
+		});
+		user.save().then(() => {
+			res.json({ message: "User created successfully", user });
 		});
 	} catch (err) {
 		res.status(401);
@@ -51,25 +50,30 @@ router.post('/', async (req, res) => {
 
 /* PATCH - update user (user- and admin-only) */
 // TODO: needs to check :auth
-router.patch('/:id', async (req, res) => {
+router.patch('/:username', async (req, res) => {
 	try {
-		const userID = req.params.id;
-		// var user = await getUserById(userID);
-		var updateParams = {};
 		const saltRounds = 10;
-		bcrypt.hashSync(req.body.password, saltRounds, (err, hash) => {
-			if (err) throw new Error('Internal Server Error');
-			//username: req.body.username ? req.boy.username : {}, // Don't allow users to change username
-			if (req.body.passHash) { updateParams.passHash = hash };
-			if (req.body.facilityName) { updateParams.facilityName = req.body.facilityName };
-			if (req.body.facilityAddress) { updateParams.facilityAddress = req.body.facilityAddress };
-			if (req.body.facilityPhone) { updateParams.facilityPhone = req.body.facilityPhone };
-			if (req.body.facilityEmail) { updateParams.facilityEmail = req.body.facilityEmail };
+		const setPassword = req.body.password && req.body.password != ""
+		const hash = await bcrypt.hash(req.body.password, saltRounds);
 
-			let user = updateUser(userID, updateParams).then(() => {
-				res.json({ message: "User updated successfully", user });
-			});
-		});
+		const username = req.params.username;
+		var updateParams = {};
+		var user = await getUserByUsername(username);
+		if (!user) {
+			res.status(404);
+			return res.send({ error: 'User does not exist' });
+		}
+
+		//username: req.body.username ? req.boy.username : {}, // Don't allow users to change username
+		if (setPassword) { updateParams.passHash = hash };
+		if (req.body.facilityName) { updateParams.facilityName = req.body.facilityName };
+		if (req.body.facilityAddress) { updateParams.facilityAddress = req.body.facilityAddress };
+		if (req.body.facilityPhone) { updateParams.facilityPhone = req.body.facilityPhone };
+		if (req.body.facilityEmail) { updateParams.facilityEmail = req.body.facilityEmail };
+
+		let updatedUser = await updateUser(user.id, updateParams);
+		res.json({ message: "User updated successfully", updatedUser });
+
 	} catch (err) {
 		res.status(404);
 		res.send({ error: 'User not found. ' + err });

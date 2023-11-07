@@ -12,13 +12,7 @@ const userSchema = mongoose.Schema({
 	},
 	passHash: {
 		type: String,
-		required: [true, 'Password is required'],
-		validate: {
-			validator: function (value) {
-				return value.length >= 8;
-			},
-			message: () => 'Password must be at least 8 characters long'
-		}
+		required: [true, 'Password is required']
 	},
 	facilityName: { type: String, required: true, select: true },
 	facilityAddress: { type: String, required: true },
