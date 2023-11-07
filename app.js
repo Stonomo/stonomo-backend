@@ -8,8 +8,6 @@ import lessMiddleware from 'less-middleware';
 import logger from 'morgan';
 import mongoose from 'mongoose';
 
-//import { process.env.PORT, MONGO_CONN_STR } from './config.js';
-
 import * as routers from './routes.js';
 import { populateReasons } from './models/Reason.js';
 

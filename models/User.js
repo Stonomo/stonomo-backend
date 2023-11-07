@@ -1,14 +1,35 @@
 import mongoose from 'mongoose';
+import validator from 'validator';
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
 const userSchema = mongoose.Schema({
-	username: { type: String, required: true, select: true, index: true },
-	passHash: { type: String, required: true },
+	username: {
+		type: String,
+		required: [true, 'Username is required'],
+		select: true,
+		index: true
+	},
+	passHash: {
+		type: String,
+		required: [true, 'Password is required'],
+		validate: {
+			validator: function (value) {
+				return value.length >= 8;
+			},
+			message: () => 'Password must be at least 8 characters long'
+		}
+	},
 	facilityName: { type: String, required: true, select: true },
 	facilityAddress: { type: String, required: true },
 	facilityPhone: { type: String, required: true, select: true },
-	facilityEmail: { type: String, required: true }
+	facilityEmail: {
+		type: String, required: true,
+		validate: {
+			validator: validator.isEmail,
+			message: props => `${props.value} is not a valid email`
+		}
+	}
 });
 
 export const User = mongoose.model('User', userSchema);
@@ -42,6 +63,10 @@ export async function updateUser(id, fields) {
 	}
 	await User.findByIdAndUpdate(id, { $set: updateParams });
 	return getUserByIdLean(id);
+}
+
+export async function findUserByUsername(username) {
+	return await User.findOne({ username: username });
 }
 
 // //TODO: delete function needs to be protected for security reasons
