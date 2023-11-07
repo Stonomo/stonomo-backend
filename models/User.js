@@ -40,6 +40,10 @@ export function addUser(username, pass_hash, facilityName, facilityAddress, faci
 	return u;
 }
 
+export async function getUserByUsername(username) {
+	return await User.findOne({ username: username });
+}
+
 export function getUserById(id) {
 	let u = User.findById(id);
 	return u;
@@ -63,10 +67,6 @@ export async function updateUser(id, fields) {
 	}
 	await User.findByIdAndUpdate(id, { $set: updateParams });
 	return getUserByIdLean(id);
-}
-
-export async function findUserByUsername(username) {
-	return await User.findOne({ username: username });
 }
 
 // //TODO: delete function needs to be protected for security reasons

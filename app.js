@@ -39,6 +39,7 @@ app.get("/status", (req, res) => {
 
 console.log("Adding Routes");
 
+app.use('/', routers.loginRouter);
 app.use('/search', routers.searchRouter);
 app.use('/user', routers.userRouter);
 app.use('/reason', routers.reasonRouter);

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { User, getUserById, updateUser } from '../models/User.js';
+import { User, getUserById, getUserByUsername, updateUser } from '../models/User.js';
 import bcrypt from 'bcrypt';
 
 var router = Router();
@@ -22,24 +22,26 @@ router.get('/:id', async (req, res) => {
 // TODO: needs to check :auth
 router.post('/', async (req, res) => {
 	try {
-		let checkExists = await findUser(req.body.username);
+		let checkExists = await getUserByUsername(req.body.username);
 
 		if (checkExists) {
 			res.status(401).json({ message: "Email is already in use." });
 			return;
 		}
 		const saltRounds = 10;
-		const passHash = bcrypt.hashSync(req.body.password, saltRounds);
-		const user = new User({
-			username: req.body.username,
-			passHash: passHash,
-			facilityName: req.body.facilityName,
-			facilityAddress: req.body.facilityAddress,
-			facilityPhone: req.body.facilityPhone,
-			facilityEmail: req.body.facilityEmail
-		});
-		user.save().then(() => {
-			res.json({ message: "User created successfully", user });
+		bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
+			if (err) throw new Error('Internal Server Error');
+			const user = new User({
+				username: req.body.username,
+				passHash: hash,
+				facilityName: req.body.facilityName,
+				facilityAddress: req.body.facilityAddress,
+				facilityPhone: req.body.facilityPhone,
+				facilityEmail: req.body.facilityEmail
+			});
+			user.save().then(() => {
+				res.json({ message: "User created successfully", user });
+			});
 		});
 	} catch (err) {
 		res.status(401);
@@ -55,15 +57,19 @@ router.patch('/:id', async (req, res) => {
 		// var user = await getUserById(userID);
 		var updateParams = {};
 		const saltRounds = 10;
-		//username: req.body.username ? req.boy.username : {}, // Don't allow users to change own username
-		if (req.body.passHash) { updateParams.passHash = bcrypt.hashSync(req.body.password, saltRounds) };
-		if (req.body.facilityName) { updateParams.facilityName = req.body.facilityName };
-		if (req.body.facilityAddress) { updateParams.facilityAddress = req.body.facilityAddress };
-		if (req.body.facilityPhone) { updateParams.facilityPhone = req.body.facilityPhone };
-		if (req.body.facilityEmail) { updateParams.facilityEmail = req.body.facilityEmail };
+		bcrypt.hashSync(req.body.password, saltRounds, (err, hash) => {
+			if (err) throw new Error('Internal Server Error');
+			//username: req.body.username ? req.boy.username : {}, // Don't allow users to change username
+			if (req.body.passHash) { updateParams.passHash = hash };
+			if (req.body.facilityName) { updateParams.facilityName = req.body.facilityName };
+			if (req.body.facilityAddress) { updateParams.facilityAddress = req.body.facilityAddress };
+			if (req.body.facilityPhone) { updateParams.facilityPhone = req.body.facilityPhone };
+			if (req.body.facilityEmail) { updateParams.facilityEmail = req.body.facilityEmail };
 
-		let user = await updateUser(userID, updateParams);
-		res.send(user);
+			let user = updateUser(userID, updateParams).then(() => {
+				res.json({ message: "User updated successfully", user });
+			});
+		});
 	} catch (err) {
 		res.status(404);
 		res.send({ error: 'User not found. ' + err });
