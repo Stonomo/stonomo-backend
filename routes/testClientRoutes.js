@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken } from '../middleware/authenticateToken';
+import { authenticateToken } from '../middleware/authenticateToken.js';
 var router = Router();
 
 /* GET home page. */
