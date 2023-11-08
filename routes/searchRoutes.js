@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { searchForEviction } from "../models/Eviction.js";
+import { authenticateToken } from "../middleware/authenticateToken.js";
 
 let router = Router();
 
-router.get('/', async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
 	try {
 		let searchParams = "";
 		if (req.body.name) { searchParams += " " + req.body.name; }

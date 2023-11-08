@@ -1,12 +1,13 @@
 import { Router } from 'express';
 
 import { Eviction, getEvictionById } from '../models/Eviction.js';
+import { authenticateToken } from '../middleware/authenticateToken.js';
 
 var router = Router();
 
 /* GET eviction listing. */
 // TODO needs to check :auth
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
 	try {
 		const evictionId = req.params.id
 		var eviction = await getEvictionById(evictionId);
@@ -20,7 +21,7 @@ router.get('/:id', async (req, res) => {
 
 /* POST - create facility */
 // TODO: needs to check :auth
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
 	try {
 		const eviction = new Eviction({
 			tenantName: req.body.tenantName,
@@ -41,7 +42,7 @@ router.post('/', async (req, res) => {
 /* PATCH - update reason (admin only) */
 // TODO: needs to check :auth
 // TODO: add check to ensure eviction.user is defined and matches req.body.user
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', authenticateToken, async (req, res) => {
 	try {
 		const evictionId = req.params.id
 		var eviction = await getEvictionById(evictionId);

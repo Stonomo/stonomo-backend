@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken'
 
 import { getUserByUsername } from '../models/User.js';
 
@@ -18,13 +19,18 @@ router.post('/login', async (req, res) => {
 		// Compare passwords
 		const result = await bcrypt.compare(req.body.password, user.passHash);
 		if (result) {
-			// TODO: add session persistence
-			return res.status(200).json({ message: "User Logged in Successfully" });
+			const token = generateAccessToken(req.body.username);
+			return res.json(token);
 		}
 		return res.status(401).json({ message: "Invalid Credentials" });
 	} catch (err) {
 		res.status(401).send(err.message);
 	}
 });
+
+function generateAccessToken(username) {
+	//process.env.TOKEN_SECRET contains private key
+	return jwt.sign({ name: username }, process.env.TOKEN_SECRET, { expiresIn: 60 * 60 });
+}
 
 export { router };

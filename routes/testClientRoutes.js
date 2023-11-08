@@ -1,16 +1,17 @@
 import { Router } from 'express';
+import { authenticateToken } from '../middleware/authenticateToken';
 var router = Router();
 
 /* GET home page. */
-router.get('/', function (req, res) {
+router.get('/', authenticateToken, function (req, res) {
   res.render('pages/index');
 });
 
-router.get('/search', function (req, res) {
+router.get('/search', authenticateToken, function (req, res) {
   res.render('pages/search');
 });
 
-router.get('/report', function (req, res) {
+router.get('/report', authenticateToken, function (req, res) {
   res.render('pages/report');
 });
 

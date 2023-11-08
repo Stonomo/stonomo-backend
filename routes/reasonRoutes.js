@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { Reason, getReasonById } from '../models/Reason.js';
+import { authenticateToken } from '../middleware/authenticateToken.js';
 var router = Router();
 
 /* GET reasons listing. */
@@ -11,7 +12,7 @@ router.get('/', async (req, res) => {
 
 /* GET - get reason by id */
 // TODO: add :auth check
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
 	try {
 		const reasonId = req.params.id
 		var reason = await getReasonById(reasonId);
@@ -24,7 +25,7 @@ router.get('/:id', async (req, res) => {
 
 /* PATCH - update reason (admin only) */
 // TODO: add :auth check
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', authenticateToken, async (req, res) => {
 	try {
 		const reasonId = req.params.id
 		var reason = await getReasonById(reasonId);
@@ -50,7 +51,7 @@ router.patch('/:id', async (req, res) => {
 /* POST - add new reason (admin only) */
 // TODO: add :auth check
 // TODO: add checks for existing reasons with matching labels
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
 	try {
 		const reason = new Reason({
 			label: req.body.label,
@@ -67,7 +68,7 @@ router.post('/', async (req, res) => {
 
 /* DELETE - delete reason (admin only) */
 // TODO: add :auth check
-router.delete('/:id', function (req, res) {
+router.delete('/:id', authenticateToken, function (req, res) {
 	// No-op for now
 	res.status(403);
 	res.send({ error: 'Forbidden' });

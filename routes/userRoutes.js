@@ -1,13 +1,14 @@
 import { Router } from 'express';
 import { User, getUserById, getUserByUsername, updateUser } from '../models/User.js';
 import bcrypt from 'bcrypt';
+import { authenticateToken } from '../middleware/authenticateToken.js';
 
 var router = Router();
 const saltRounds = 10;
 
 /* GET user record. */
 // TODO needs to check :auth
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
 	try {
 		const userID = req.params.id
 		var user = await getUserById(userID);
@@ -21,7 +22,7 @@ router.get('/:id', async (req, res) => {
 
 /* POST - create user */
 // TODO: needs to check :auth
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
 	try {
 		const hash = await bcrypt.hash(req.body.password, saltRounds);
 		let checkExists = await getUserByUsername(req.body.username);
@@ -50,7 +51,7 @@ router.post('/', async (req, res) => {
 
 /* PATCH - update user (user- and admin-only) */
 // TODO: needs to check :auth
-router.patch('/:username', async (req, res) => {
+router.patch('/:username', authenticateToken, async (req, res) => {
 	try {
 		const saltRounds = 10;
 		const setPassword = req.body.password && req.body.password != ""
@@ -83,7 +84,7 @@ router.patch('/:username', async (req, res) => {
 
 /* DELETE - remove user (admin only) */
 // TODO: add :auth check
-router.delete('/:id', function (req, res, next) {
+router.delete('/:id', authenticateToken, function (req, res, next) {
 	// No-op for now
 	res.status(403);
 	res.send({ error: 'Forbidden' });
