@@ -2,6 +2,7 @@ import createError from 'http-errors';
 import express from 'express';
 import path, { join } from 'path';
 import { fileURLToPath } from 'url';
+import cors from 'cors';
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import lessMiddleware from 'less-middleware';
@@ -24,8 +25,11 @@ console.log("Configuring Express");
 
 app.set('views', join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
+	
 app.use(logger('dev'));
+app.use(cors({
+	origin: 'http://localhost:3000',
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -40,11 +44,11 @@ app.get("/status", (req, res) => {
 console.log("Adding Routes");
 
 app.use('/', routers.loginRouter);
-app.use('/search', routers.searchRouter);
-app.use('/user', routers.userRouter);
-app.use('/reason', routers.reasonRouter);
-app.use('/eviction', routers.evictionRouter);
-app.use('/tc', routers.testClientRouter);
+app.use('/v1/search', routers.searchRouter);
+app.use('/v1/user', routers.userRouter);
+app.use('/v1/reason', routers.reasonRouter);
+app.use('/v1/eviction', routers.evictionRouter);
+// app.use('/tc', routers.testClientRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

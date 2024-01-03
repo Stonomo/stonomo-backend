@@ -4,13 +4,9 @@ import { authenticateToken } from "../middleware/authenticateToken.js";
 
 let router = Router();
 
-router.get('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
 	try {
-		let searchParams = "";
-		if (req.body.name) { searchParams += " " + req.body.name; }
-		if (req.body.phone) { searchParams += " " + req.body.phone; }
-		if (req.body.email) { searchParams += " " + req.body.email; }
-		searchParams = searchParams.trim();
+		let searchParams = req.body.search.trim();
 		let results = await searchForEviction(searchParams);
 		res.send(results);
 	} catch (err) {

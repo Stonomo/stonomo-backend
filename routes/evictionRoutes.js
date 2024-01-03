@@ -39,7 +39,7 @@ router.post('/', authenticateToken, async (req, res) => {
 	}
 })
 
-/* PATCH - update reason (admin only) */
+/* PATCH - update eviction (admin only) */
 // TODO: needs to check :auth
 // TODO: add check to ensure eviction.user is defined and matches req.body.user
 router.patch('/:id', authenticateToken, async (req, res) => {
