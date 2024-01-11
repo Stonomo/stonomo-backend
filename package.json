@@ -1,6 +1,6 @@
 {
   "name": "stonomo",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,18 +8,15 @@
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
-    "debug": "^2.6.9",
     "dotenv": "^16.3.1",
-    "ejs": "^3.1.9",
     "express": "^4.18.2",
-    "http-errors": "^1.6.3",
+    "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
-    "less-middleware": "^2.2.1",
-    "mongoose": "^7.6.3",
-    "morgan": "^1.9.1",
+    "less-middleware": "^3.1.0",
+    "mongoose": "^8.0.4",
+    "morgan": "^1.10.0",
     "validator": "^13.11.0"
   },
   "devDependencies": {
