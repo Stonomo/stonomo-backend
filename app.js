@@ -25,10 +25,10 @@ console.log("Configuring Express");
 
 app.set('views', join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-	
+
 app.use(logger('dev'));
 app.use(cors({
-	origin: 'http://localhost:3000',
+	origin: ['http://localhost:3000', 'http://localhost:5173'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
