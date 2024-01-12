@@ -6,7 +6,7 @@ let router = Router();
 
 router.post('/', authenticateToken, async (req, res) => {
 	try {
-		let searchParams = req.body.search.trim();
+		let searchParams = req.body.q.trim();
 		let results = await searchForEviction(searchParams);
 		res.send(results);
 	} catch (err) {
