@@ -44,9 +44,9 @@ console.log("Adding Routes");
 
 app.use('/', routers.loginRouter);
 app.use('/v1/search', routers.searchRouter);
-app.use('/v1/user', routers.userRouter);
-app.use('/v1/reason', routers.reasonRouter);
-app.use('/v1/eviction', routers.evictionRouter);
+app.use('/v1/users', routers.userRouter);
+app.use('/v1/reasons', routers.reasonRouter);
+app.use('/v1/evictions', routers.evictionRouter);
 // app.use('/tc', routers.testClientRouter);
 
 // catch 404 and forward to error handler
