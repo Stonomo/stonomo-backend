@@ -46,7 +46,12 @@ export function updateEviction(id, ...fields) {
 }
 
 export async function searchForEviction(textSearchParams) {
-	const findQuery = Eviction.find({ $text: { $search: textSearchParams } }).populate('user', 'facilityName facilityPhone').populate('reason').lean();
+	// TODO: change to use regex on tenant fields
+	const findQuery = Eviction.find({ $text: { $search: textSearchParams } })
+		.populate('user', 'facilityName facilityPhone')
+		.populate('reason')
+		.limit(10)
+		.lean();
 	//search Evictions by querying Eviction
 	return await findQuery;
 }

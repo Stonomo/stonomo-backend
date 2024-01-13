@@ -30,7 +30,7 @@ router.post('/login', async (req, res) => {
 
 function generateAccessToken(username) {
 	//process.env.TOKEN_SECRET contains private key
-	return jwt.sign({ name: username }, process.env.TOKEN_SECRET, { expiresIn: 60 * 60 });
+	return jwt.sign({ name: username }, process.env.TOKEN_SECRET, { expiresIn: 60 * 60 * 24 });
 }
 
 export { router };
