@@ -24,7 +24,6 @@ console.log("Configuring Express");
 // view engine setup
 
 app.set('views', join(__dirname, 'views'));
-app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(cors({
@@ -63,7 +62,10 @@ app.use(function (err, req, res, next) {
 
 	// render the error page
 	res.status(err.status || 500);
-	res.render('error');
+	res.json({
+		message: err.message,
+		error: err
+	});
 });
 
 console.log("Connecting to Database");
