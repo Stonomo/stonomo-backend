@@ -1,12 +1,11 @@
 import { Router } from 'express';
 
-import { Eviction, getEvictionById } from '../models/Eviction.js';
+import { Eviction, getEvictionById, getEvictionsByUser } from '../models/Eviction.js';
 import { authenticateToken } from '../middleware/authenticateToken.js';
 
 var router = Router();
 
 /* GET eviction listing. */
-// TODO needs to check :auth
 router.get('/:id', authenticateToken, async (req, res) => {
 	try {
 		const evictionId = req.params.id
@@ -19,8 +18,20 @@ router.get('/:id', authenticateToken, async (req, res) => {
 
 });
 
+/* GET eviction listing. */
+router.get('/by-user/:username', authenticateToken, async (req, res) => {
+	try {
+		const username = req.params.username
+		var evictions = await getEvictionsByUser(username);
+		res.send(evictions);
+	} catch (err) {
+		res.status(404);
+		res.send({ error: 'Eviction record does not exist' });
+	}
+
+});
+
 /* POST - create facility */
-// TODO: needs to check :auth
 router.post('/', authenticateToken, async (req, res) => {
 	try {
 		const eviction = new Eviction({
@@ -40,7 +51,6 @@ router.post('/', authenticateToken, async (req, res) => {
 })
 
 /* PATCH - update eviction (admin only) */
-// TODO: needs to check :auth
 // TODO: add check to ensure eviction.user is defined and matches req.body.user
 router.patch('/:id', authenticateToken, async (req, res) => {
 	try {
@@ -67,10 +77,10 @@ router.patch('/:id', authenticateToken, async (req, res) => {
 
 });
 
-/* DELETE - remove eviction (admin only) */
+/* DELETE - remove eviction */
 // TODO: add :auth check
 router.delete('/:id', function (req, res, next) {
-	// No-op for now
+	// TODO: replace no-op
 	res.status(403);
 	res.send({ error: 'Forbidden' });
 });

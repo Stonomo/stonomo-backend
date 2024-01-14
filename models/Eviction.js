@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { getUserByUsername } from './User.js';
 
 //TODO: add validation and error handling
 const evictionsSchema = new mongoose.Schema({
@@ -29,6 +30,13 @@ export function getEvictionByIdLean(id) {
 	let e = Eviction.findById(id)
 		.lean();
 	return e;
+}
+
+export async function getEvictionsByUser(username) {
+	const { _id } = await getUserByUsername(username);
+	const id = _id;
+	const query = Eviction.find({ user: id });
+	return await query;
 }
 
 export function updateEviction(id, ...fields) {
