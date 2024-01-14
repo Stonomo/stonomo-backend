@@ -8,10 +8,10 @@ const saltRounds = 10;
 
 /* GET user record. */
 // TODO needs to check :auth
-router.get('/:id', authenticateToken, async (req, res) => {
+router.get('/:username', authenticateToken, async (req, res) => {
 	try {
-		const userID = req.params.id
-		var user = await getUserById(userID);
+		const username = req.params.username;
+		var user = await getUserByUsername(username);
 		res.send(user);
 	} catch {
 		res.status(404);
