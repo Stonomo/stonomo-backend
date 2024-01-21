@@ -31,7 +31,7 @@ router.get('/by-user/:username', authenticateToken, async (req, res) => {
 
 });
 
-/* POST - create facility */
+/* POST - create eviction */
 router.post('/', authenticateToken, async (req, res) => {
 	try {
 		const eviction = new Eviction({
