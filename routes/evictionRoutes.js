@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { Eviction, getEvictionById, getEvictionsByUser } from '../models/Eviction.js';
 import { authenticateToken } from '../middleware/authenticateToken.js';
+import jwt from 'jsonwebtoken';
 
 var router = Router();
 
@@ -19,9 +20,12 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 /* GET eviction listing. */
-router.get('/by-user/:username', authenticateToken, async (req, res) => {
+router.post('/by-user', authenticateToken, async (req, res) => {
 	try {
-		const username = req.params.username
+		const authHeader = req.headers['authorization']
+		const token = authHeader && authHeader.split(' ')[1]
+		const { name } = jwt.decode(token)
+		const username = name
 		var evictions = await getEvictionsByUser(username);
 		res.send(evictions);
 	} catch (err) {
@@ -78,8 +82,7 @@ router.patch('/:id', authenticateToken, async (req, res) => {
 });
 
 /* DELETE - remove eviction */
-// TODO: add :auth check
-router.delete('/:id', function (req, res, next) {
+router.delete('/:id', authenticateToken, function (req, res, next) {
 	// TODO: replace no-op
 	res.status(403);
 	res.send({ error: 'Forbidden' });
