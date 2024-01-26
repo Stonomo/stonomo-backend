@@ -22,12 +22,16 @@ export async function addEviction(tenantName, tenantPhone, tenantEmail, user, re
 }
 
 export function getEvictionById(id) {
-	let e = Eviction.findById(id);
+	let e = Eviction.findById(id)
+		.populate('user', 'facilityName facilityPhone')
+		.populate('reason', 'desc');
 	return e;
 }
 
 export function getEvictionByIdLean(id) {
 	let e = Eviction.findById(id)
+		.populate('user', 'facilityName facilityPhone')
+		.populate('reason', 'desc')
 		.lean();
 	return e;
 }
@@ -35,7 +39,9 @@ export function getEvictionByIdLean(id) {
 export async function getEvictionsByUser(username) {
 	const { _id } = await getUserByUsername(username);
 	const id = _id;
-	const query = Eviction.find({ user: id });
+	const query = Eviction.find({ user: id })
+		.populate('user', 'facilityName facilityPhone')
+		.populate('reason', 'desc');
 	return await query;
 }
 
@@ -57,7 +63,7 @@ export async function searchForEviction(textSearchParams) {
 	// TODO: change to use regex on tenant fields
 	const findQuery = Eviction.find({ $text: { $search: textSearchParams } })
 		.populate('user', 'facilityName facilityPhone')
-		.populate('reason')
+		.populate('reason', 'desc')
 		.limit(10)
 		.lean();
 	//search Evictions by querying Eviction
