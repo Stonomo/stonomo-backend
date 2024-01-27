@@ -19,7 +19,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 
 });
 
-/* GET eviction listing. */
+/* GET eviction listings by reporting user. */
 router.post('/by-user', authenticateToken, async (req, res) => {
 	try {
 		const authHeader = req.headers['authorization']
@@ -41,6 +41,7 @@ router.post('/', authenticateToken, async (req, res) => {
 		const eviction = new Eviction({
 			tenantName: req.body.tenantName,
 			tenantPhone: req.body.tenantPhone,
+			tenantEmail: req.body.tenantEmail,
 			user: req.body.user,
 			reason: req.body.reason,
 			details: req.body.details, //TODO: convert to nested document with multiple entries and timestamps for each
@@ -61,16 +62,14 @@ router.patch('/:id', authenticateToken, async (req, res) => {
 		const evictionId = req.params.id
 		var eviction = await getEvictionById(evictionId);
 
-		if (!req.body.user || req.body.user != eviction.user) {
-			throw new Error("Invalid form data submitted.")
-		}
+		// TODO: compare username from jwt to username in eviction and reject if mismatched
 
-		if (req.body.tenantName) { eviction.tenantName = req.body.tenantName }
-		if (req.body.tenantPhone) { eviction.tenantPhone = req.body.tenantPhone }
-		if (req.body.tenantEmail) { eviction.tenantEmail = req.body.tenantEmail }
-		if (req.body.reason) { eviction.reason = req.body.reason }
+		// if (req.body.tenantName) { eviction.tenantName = req.body.tenantName }
+		// if (req.body.tenantPhone) { eviction.tenantPhone = req.body.tenantPhone }
+		// if (req.body.tenantEmail) { eviction.tenantEmail = req.body.tenantEmail }
+		// if (req.body.reason) { eviction.reason = req.body.reason }
 		if (req.body.details) { eviction.details += '\n\n' + req.body.details }
-		if (req.body.evictedOn) { eviction.evictedOn = req.body.evictedOn }
+		// if (req.body.evictedOn) { eviction.evictedOn = req.body.evictedOn }
 
 		await eviction.save();
 		res.send(eviction);
@@ -84,7 +83,7 @@ router.patch('/:id', authenticateToken, async (req, res) => {
 /* DELETE - remove eviction */
 router.delete('/:id', authenticateToken, function (req, res, next) {
 	// TODO: replace no-op
-	res.status(403);
+	res.status(501);
 	res.send({ error: 'Forbidden' });
 });
 
