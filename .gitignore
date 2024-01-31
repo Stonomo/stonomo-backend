@@ -1,3 +1,6 @@
+# MongoDB databases
+data/db
+
 # Logs
 logs
 *.log

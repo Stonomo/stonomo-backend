@@ -1,0 +1,31 @@
+version: "3"
+services:
+  stonomo-backend:
+    container_name: stonomo_backend
+    image: stonomo/backend
+    build:
+      dockerfile: ./Dockerfile
+    ports:
+      - "7867:7867"
+    links:
+      - stonomo-database
+    networks:
+      stonomo_bridge:
+        ipv4_address: 172.0.0.3
+
+  stonomo-database:
+    container_name: stonomo_db
+    image: mongo:latest
+    volumes:
+      - ./data/db:/data/db
+    networks:
+      stonomo_bridge:
+        ipv4_address: 172.0.0.2
+
+networks:
+  stonomo_bridge:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.0.0.0/16
+          gateway: 172.0.0.1
