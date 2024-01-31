@@ -9,7 +9,8 @@ const evictionsSchema = new mongoose.Schema({
 	user: { type: mongoose.ObjectId, ref: 'User', required: true, index: true },
 	reason: { type: mongoose.ObjectId, ref: 'Reason', required: true, index: true },
 	details: { type: String, required: true },
-	evictedOn: { type: Date, required: true }
+	evictedOn: { type: Date, required: true },
+	testData: Boolean
 }, { timestamps: true });
 
 evictionsSchema.index({ tenantName: "text", tenantPhone: "text", tenantEmail: "text" });
@@ -77,3 +78,33 @@ export async function searchForEviction(textSearchParams) {
 // 		.then(console.log);
 // 	return e;
 // }
+
+export async function populateSampleEvictions() {
+	console.log("-Importing sample eviction data")
+	const mockEvictionData = await import('../data/MOCKevictions.json', { with: { type: "json" } });
+	console.log("-Transforming eviction data")
+	const evictionArray = []
+	for (const ix in mockEvictionData) {
+		const evics = mockEvictionData[ix]
+		for (const evic of evics) {
+			evictionArray.push({
+				replaceOne: {
+					upsert: true,
+					filter: { _id: evic._id.$oid },
+					replacement: {
+						tenantName: evic.tenantName,
+						tenantPhone: evic.tenantPhone,
+						tenantEmail: evic.tenantEmail,
+						user: evic.user.$oid,
+						reason: evic.reason.$oid,
+						details: evic.details,
+						evictedOn: evic.evictedOn,
+						testData: true
+					}
+				}
+			});
+		}
+	}
+	console.log("-Writing eviction data to db")
+	await Eviction.bulkWrite(evictionArray);
+}

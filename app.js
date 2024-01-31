@@ -11,6 +11,8 @@ import mongoose from 'mongoose';
 
 import * as routers from './routes.js';
 import { populateReasons } from './models/Reason.js';
+import { populateSampleUsers } from './models/User.js';
+import { populateSampleEvictions } from './models/Eviction.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,6 +86,11 @@ if (connectStatus) {
 console.log("Populating Reasons List");
 
 await populateReasons();
+
+console.log("Populating Sample Data");
+
+await populateSampleUsers();
+await populateSampleEvictions();
 
 console.log("Opening Ports");
 

@@ -14,16 +14,29 @@ const userSchema = mongoose.Schema({
 		type: String,
 		required: [true, 'Password is required']
 	},
-	facilityName: { type: String, required: true, select: true },
-	facilityAddress: { type: String, required: true },
-	facilityPhone: { type: String, required: true, select: true },
+	facilityName: {
+		type: String,
+		required: true,
+		select: true
+	},
+	facilityAddress: {
+		type: String,
+		required: true
+	},
+	facilityPhone: {
+		type: String,
+		required: true,
+		select: true
+	},
 	facilityEmail: {
-		type: String, required: true,
+		type: String,
+		required: true,
 		validate: {
 			validator: validator.isEmail,
 			message: props => `${props.value} is not a valid email`
 		}
-	}
+	},
+	testData: { type: Boolean, required: true }
 });
 
 export const User = mongoose.model('User', userSchema);
@@ -70,3 +83,32 @@ export async function updateUser(id, fields) {
 // 		.then(console.log);
 // 	return u;
 // }
+
+export async function populateSampleUsers() {
+	console.log("-Importing sample users")
+	const mockUserData = await import('../data/MOCKusers.json', { with: { type: "json" } });
+	console.log("-Transforming user data")
+	const userArray = []
+	for (const ix in mockUserData) {
+		const users = mockUserData[ix]
+		for (const user of users) {
+			userArray.push({
+				replaceOne: {
+					upsert: true,
+					filter: { username: user.username },
+					replacement: {
+						username: user.username,
+						passHash: user.passHash,
+						facilityName: user.facilityName,
+						facilityAddress: user.facilityAddress,
+						facilityPhone: user.facilityPhone,
+						facilityEmail: user.facilityEmail,
+						testData: true
+					}
+				}
+			});
+		}
+	}
+	console.log("-Writing user data to db")
+	await User.bulkWrite(userArray);
+}
