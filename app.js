@@ -70,10 +70,16 @@ app.use(function (err, req, res, next) {
 
 console.log("Connecting to Database");
 
-mongoose.connect(process.env.MONGODB_URI).then(console.log('Connection success!')).catch(err => {
+let connectStatus;
+try {
+	connectStatus = await mongoose.connect(process.env.MONGODB_URI);
+} catch (err) {
 	console.log('Failed to connect to MongoDB');
 	console.log(err);
-});
+};
+if (connectStatus) {
+	console.log("Connection Success!" + process.env.MONGODB_URI);
+}
 
 console.log("Populating Reasons List");
 
