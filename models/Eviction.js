@@ -3,27 +3,79 @@ import { getUserByUsername } from './User.js';
 
 //TODO: add validation and error handling
 const evictionsSchema = new mongoose.Schema({
-	tenantName: { type: String, required: true, index: true },
-	tenantPhone: { type: String, index: true },
-	tenantEmail: { type: String, index: true },
-	user: { type: mongoose.ObjectId, ref: 'User', required: true, index: true },
-	reason: { type: mongoose.ObjectId, ref: 'Reason', required: true, index: true },
-	details: { type: String, required: true },
-	evictedOn: { type: Date, required: true },
-	testData: Boolean
+	tenantName: {
+		type: String,
+		required: true,
+		index: true
+	},
+	tenantPhone: {
+		type: String,
+		index: true
+	},
+	tenantEmail: {
+		type: String,
+		index: true
+	},
+	user: {
+		type: mongoose.ObjectId,
+		ref: 'User',
+		required: true,
+		index: true
+	},
+	reason: {
+		type: mongoose.ObjectId,
+		ref: 'Reason',
+		required: true,
+		index: true
+	},
+	details: {
+		type: String,
+		required: true
+	},
+	evictedOn: {
+		type: Date,
+		required: true
+	},
+	testData: {
+		type: Boolean,
+		required: true,
+		default: false
+	}
 }, { timestamps: true });
 
 evictionsSchema.index({ tenantName: "text", tenantPhone: "text", tenantEmail: "text" });
 
 export const Eviction = mongoose.model("Eviction", evictionsSchema);
+export const ConfirmEviction = mongoose.model("ConfirmEviction", evictionsSchema);
 
 export async function addEviction(tenantName, tenantPhone, tenantEmail, user, reason, details, evictedOn) {
-	let e = await Eviction.create(tenantName, tenantPhone, tenantEmail, user, reason, details, evictedOn);
+	let e = await Eviction.create(tenantName, tenantPhone, tenantEmail, user, reason, details, evictedOn, false);
 	return e;
+}
+
+export async function addConfirmEviction(tenantName, tenantPhone, tenantEmail, user, reason, details, evictedOn) {
+	let e = await ConfirmEviction.create({
+		tenantName: tenantName,
+		tenantPhone: tenantPhone,
+		tenantEmail: tenantEmail,
+		user: user,
+		reason: reason,
+		details: details,
+		evictedOn: evictedOn,
+		testData: false
+	});
+	return e._id.toString();
 }
 
 export function getEvictionById(id) {
 	let e = Eviction.findById(id)
+		.populate('user', 'facilityName facilityPhone')
+		.populate('reason', 'desc');
+	return e;
+}
+
+export function getConfirmEvictionById(id) {
+	let e = ConfirmEviction.findById(id)
 		.populate('user', 'facilityName facilityPhone')
 		.populate('reason', 'desc');
 	return e;

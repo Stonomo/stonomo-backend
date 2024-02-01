@@ -36,7 +36,7 @@ const userSchema = mongoose.Schema({
 			message: props => `${props.value} is not a valid email`
 		}
 	},
-	testData: { type: Boolean, required: true }
+	testData: { type: Boolean, required: true, default: false }
 });
 
 export const User = mongoose.model('User', userSchema);

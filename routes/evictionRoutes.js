@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { Eviction, getEvictionById, getEvictionsByUser } from '../models/Eviction.js';
+import { Eviction, ConfirmEviction, getEvictionById, getEvictionsByUser, addEviction, addConfirmEviction, getConfirmEvictionById } from '../models/Eviction.js';
 import { authenticateToken } from '../middleware/authenticateToken.js';
 import jwt from 'jsonwebtoken';
 
@@ -10,7 +10,20 @@ var router = Router();
 router.get('/:id', authenticateToken, async (req, res) => {
 	try {
 		const evictionId = req.params.id
-		var eviction = await getEvictionById(evictionId);
+		var eviction = await getEvictionByIdLean(evictionId);
+		res.send(eviction);
+	} catch (err) {
+		res.status(404);
+		res.send({ error: 'Eviction record does not exist' });
+	}
+
+});
+
+/* GET confirm eviction listing. */
+router.get('/confirm/:id', authenticateToken, async (req, res) => {
+	try {
+		const evictionId = req.params.id
+		var eviction = await getConfirmEvictionById(evictionId);
 		res.send(eviction);
 	} catch (err) {
 		res.status(404);
@@ -38,20 +51,39 @@ router.post('/by-user', authenticateToken, async (req, res) => {
 /* POST - create eviction */
 router.post('/', authenticateToken, async (req, res) => {
 	try {
-		const eviction = new Eviction({
-			tenantName: req.body.tenantName,
-			tenantPhone: req.body.tenantPhone,
-			tenantEmail: req.body.tenantEmail,
-			user: req.body.user,
-			reason: req.body.reason,
-			details: req.body.details, //TODO: convert to nested document with multiple entries and timestamps for each
-			evictedOn: req.body.evictedOn
-		});
-		await eviction.save();
+		const eviction = await addEviction(
+			req.body.tenantName,
+			req.body.tenantPhone,
+			req.body.tenantEmail,
+			req.body.user,
+			req.body.reason,
+			req.body.details, //TODO: convert to nested document with multiple entries and timestamps for each
+			req.body.evictedOn
+		);
 		res.send(eviction);
 	} catch (err) {
 		res.status(500);
 		res.send({ error: 'Internal Server Error' });
+	}
+})
+
+/* POST - create eviction */
+router.post('/confirm/', authenticateToken, async (req, res) => {
+	try {
+		const evictionId = await addConfirmEviction(
+			req.body.tenantName,
+			req.body.tenantPhone,
+			req.body.tenantEmail,
+			req.body.user,
+			req.body.reason,
+			req.body.details, //TODO: convert to nested document with multiple entries and timestamps for each
+			req.body.evictedOn
+		);
+		res.send(evictionId);
+	} catch (err) {
+		console.error(err.message)
+		res.status(500);
+		res.send({ error: 'Internal Server Error.' });
 	}
 })
 
