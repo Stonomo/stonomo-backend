@@ -1,6 +1,11 @@
 import { Router } from 'express';
-
-import { Eviction, ConfirmEviction, getEvictionById, getEvictionsByUser, addEviction, addConfirmEviction, getConfirmEvictionById } from '../models/Eviction.js';
+import {
+	getEvictionByIdLean,
+	getEvictionsByUser,
+	addEviction,
+	addConfirmEviction,
+	getConfirmEvictionById
+} from '../models/Eviction.js';
 import { authenticateToken } from '../middleware/authenticateToken.js';
 import jwt from 'jsonwebtoken';
 
