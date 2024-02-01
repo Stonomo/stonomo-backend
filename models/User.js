@@ -51,13 +51,13 @@ export async function getUserByUsername(username) {
 	return await User.findOne({ username: username });
 }
 
-export function getUserById(id) {
-	let u = User.findById(id);
+export async function getUserById(id) {
+	let u = await User.findById(id);
 	return u;
 }
 
-export function getUserByIdLean(id) {
-	let u = User.findById(id)
+export async function getUserByIdLean(id) {
+	let u = await User.findById(id)
 		.lean();
 	return u;
 }
