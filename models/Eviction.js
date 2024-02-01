@@ -46,14 +46,43 @@ const evictionsSchema = new mongoose.Schema({
 evictionsSchema.index({ tenantName: "text", tenantPhone: "text", tenantEmail: "text" });
 
 export const Eviction = mongoose.model("Eviction", evictionsSchema);
-export const ConfirmEviction = mongoose.model("ConfirmEviction", evictionsSchema);
 
-export async function addEviction(tenantName, tenantPhone, tenantEmail, user, reason, details, evictedOn) {
-	let e = await Eviction.create(tenantName, tenantPhone, tenantEmail, user, reason, details, evictedOn, false);
-	return e;
+const confirmEvictionsSchema = evictionsSchema.clone()
+confirmEvictionsSchema.index({ "createdAt": 1 }, { expireAfterSeconds: 60 * 60 * 24 })
+
+export const ConfirmEviction = mongoose.model("ConfirmEviction", confirmEvictionsSchema);
+
+export async function addEviction(
+	tenantName,
+	tenantPhone,
+	tenantEmail,
+	user,
+	reason,
+	details,
+	evictedOn
+) {
+	let e = await Eviction.create({
+		tenantName: tenantName,
+		tenantPhone: tenantPhone,
+		tenantEmail: tenantEmail,
+		user: user,
+		reason: reason,
+		details: details,
+		evictedOn: evictedOn,
+		testData: false
+	});
+	return e._id.toString();
 }
 
-export async function addConfirmEviction(tenantName, tenantPhone, tenantEmail, user, reason, details, evictedOn) {
+export async function addConfirmEviction(
+	tenantName,
+	tenantPhone,
+	tenantEmail,
+	user,
+	reason,
+	details,
+	evictedOn
+) {
 	let e = await ConfirmEviction.create({
 		tenantName: tenantName,
 		tenantPhone: tenantPhone,
@@ -67,22 +96,22 @@ export async function addConfirmEviction(tenantName, tenantPhone, tenantEmail, u
 	return e._id.toString();
 }
 
-export function getEvictionById(id) {
-	let e = Eviction.findById(id)
+export async function getEvictionById(id) {
+	let e = await Eviction.findById(id)
 		.populate('user', 'facilityName facilityPhone')
 		.populate('reason', 'desc');
 	return e;
 }
 
-export function getConfirmEvictionById(id) {
-	let e = ConfirmEviction.findById(id)
+export async function getConfirmEvictionById(id) {
+	let e = await ConfirmEviction.findById(id)
 		.populate('user', 'facilityName facilityPhone')
 		.populate('reason', 'desc');
 	return e;
 }
 
-export function getEvictionByIdLean(id) {
-	let e = Eviction.findById(id)
+export async function getEvictionByIdLean(id) {
+	let e = await Eviction.findById(id)
 		.populate('user', 'facilityName facilityPhone')
 		.populate('reason', 'desc')
 		.lean();
