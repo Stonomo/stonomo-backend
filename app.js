@@ -81,21 +81,22 @@ try {
 };
 if (connectStatus) {
 	console.log("Connection Success!" + process.env.MONGODB_URI);
+
+
+	console.log("Populating Reasons List");
+
+	await populateReasons();
+
+	console.log("Populating Sample Data");
+
+	await populateSampleUsers();
+	await populateSampleEvictions();
+
+	console.log("Opening Ports");
+
+	app.listen(process.env.PORT, () => {
+		console.log("Server listening on port:", process.env.PORT);
+	});
 }
-
-console.log("Populating Reasons List");
-
-await populateReasons();
-
-console.log("Populating Sample Data");
-
-await populateSampleUsers();
-await populateSampleEvictions();
-
-console.log("Opening Ports");
-
-app.listen(process.env.PORT, () => {
-	console.log("Server listening on port:", process.env.PORT);
-});
 
 export default app;
