@@ -4,7 +4,9 @@ import {
 	getEvictionsByUser,
 	addEviction,
 	addConfirmEviction,
-	getConfirmEvictionById
+	getConfirmEvictionById,
+	getEvictionById,
+	deleteEviction
 } from '../models/Eviction.js';
 import { authenticateToken } from '../middleware/authenticateToken.js';
 import jwt from 'jsonwebtoken';
@@ -118,10 +120,15 @@ router.patch('/:id', authenticateToken, async (req, res) => {
 });
 
 /* DELETE - remove eviction */
-router.delete('/:id', authenticateToken, function (req, res, next) {
-	// TODO: replace no-op
-	res.status(501);
-	res.send({ error: 'Forbidden' });
+router.delete('/:id', authenticateToken, async (req, res, next) => {
+	try {
+		const evictionId = req.params.id;
+		const eviction = await deleteEviction(evictionId);
+		res.send(eviction)
+	} catch (err) {
+		res.status(501);
+		res.send({ error: 'Forbidden' });
+	}
 });
 
 

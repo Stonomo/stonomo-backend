@@ -121,10 +121,10 @@ export async function getEvictionByIdLean(id) {
 export async function getEvictionsByUser(username) {
 	const { _id } = await getUserByUsername(username);
 	const id = _id;
-	const query = Eviction.find({ user: id })
+	const e = await Eviction.find({ user: id })
 		.populate('user', 'facilityName facilityPhone')
 		.populate('reason', 'desc');
-	return await query;
+	return e;
 }
 
 export function updateEviction(id, ...fields) {
@@ -136,29 +136,25 @@ export function updateEviction(id, ...fields) {
 	}
 
 	let e = Eviction.findByIdAndUpdate(id, { $set: updateParams })
-		.lean()
-		.then(console.log);
+		.lean();
 	return e;
 }
 
 export async function searchForEviction(textSearchParams) {
 	// TODO: change to use regex on tenant fields
-	const findQuery = Eviction.find({ $text: { $search: textSearchParams } })
+	const e = await Eviction.find({ $text: { $search: textSearchParams } })
 		.populate('user', 'facilityName facilityPhone')
 		.populate('reason', 'desc')
-		.limit(10)
+		// .limit(10)
 		.lean();
 	//search Evictions by querying Eviction
-	return await findQuery;
+	return e;
 }
 
-// //TODO: delete function needs to be protected for security reasons
-// export function __deleteEviction(id) {
-// 	let e = Eviction.findByIdAndDelete(id)
-// 		.lean()
-// 		.then(console.log);
-// 	return e;
-// }
+export async function deleteEviction(id) {
+	let e = await Eviction.findByIdAndDelete(id)
+	return e._id.toJSON();
+}
 
 export async function populateSampleEvictions() {
 	console.log("-Importing sample eviction data")
