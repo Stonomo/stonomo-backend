@@ -2,12 +2,12 @@
     "configurations": [
         {
             "name": "Launch Program",
-            "program": "${workspaceFolder}/app.js",
+            "command": "npm run start",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "node"
+            "type": "node-terminal"
         }
     ]
 }
