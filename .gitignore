@@ -1,3 +1,6 @@
+# Secrets
+secrets/
+
 # MongoDB databases
 data/db
 

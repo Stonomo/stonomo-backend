@@ -34,4 +34,4 @@ networks:
 
 secrets:
   token_secret:
-    file: token_secret.txt
+    file: secrets/token_secret.txt
