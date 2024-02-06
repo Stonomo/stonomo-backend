@@ -12,6 +12,8 @@ services:
     networks:
       stonomo_bridge:
         ipv4_address: 172.0.0.3
+    secrets:
+      - token_secret
 
   stonomo-database:
     container_name: stonomo_db
@@ -29,3 +31,7 @@ networks:
       config:
         - subnet: 172.0.0.0/16
           gateway: 172.0.0.1
+
+secrets:
+  token_secret:
+    file: token_secret.txt
