@@ -9,8 +9,10 @@ import {
 	deleteEviction
 } from '../models/Eviction.js';
 import { authenticateToken } from '../middleware/authenticateToken.js';
-import jwt from 'jsonwebtoken';
-import { extractUsernameFromAuthHeaderToken } from '../lib/jwtHelper.js';
+import {
+	extractTokenFromAuthHeader,
+	getUseridFromToken
+} from '../lib/jwtHelper.js';
 
 var router = Router();
 
@@ -56,11 +58,12 @@ router.post('/by-user', authenticateToken, async (req, res) => {
 /* POST - create eviction */
 router.post('/', authenticateToken, async (req, res) => {
 	try {
+		const userid = getUseridFromToken(extractTokenFromAuthHeader(req.headers));
 		const eviction = await addEviction(
 			req.body.tenantName,
 			req.body.tenantPhone,
 			req.body.tenantEmail,
-			req.body.user,
+			userid,
 			req.body.reason,
 			req.body.details, //TODO: convert to nested document with multiple entries and timestamps for each
 			req.body.evictedOn
@@ -75,11 +78,12 @@ router.post('/', authenticateToken, async (req, res) => {
 /* POST - create eviction */
 router.post('/confirm/', authenticateToken, async (req, res) => {
 	try {
+		const userid = getUseridFromToken(extractTokenFromAuthHeader(req.headers));
 		const evictionId = await addConfirmEviction(
 			req.body.tenantName,
 			req.body.tenantPhone,
 			req.body.tenantEmail,
-			req.body.user,
+			userid,
 			req.body.reason,
 			req.body.details, //TODO: convert to nested document with multiple entries and timestamps for each
 			req.body.evictedOn
