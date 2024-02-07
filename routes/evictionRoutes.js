@@ -10,6 +10,7 @@ import {
 } from '../models/Eviction.js';
 import { authenticateToken } from '../middleware/authenticateToken.js';
 import jwt from 'jsonwebtoken';
+import { extractUsernameFromAuthHeaderToken } from '../lib/jwtHelper.js';
 
 var router = Router();
 
@@ -42,10 +43,7 @@ router.get('/confirm/:id', authenticateToken, async (req, res) => {
 /* GET eviction listings by reporting user. */
 router.post('/by-user', authenticateToken, async (req, res) => {
 	try {
-		const authHeader = req.headers['authorization']
-		const token = authHeader && authHeader.split(' ')[1]
-		const { name } = jwt.decode(token)
-		const username = name
+		const username = extractUsernameFromAuthHeaderToken(req.headers)
 		var evictions = await getEvictionsByUser(username);
 		res.send(evictions);
 	} catch (err) {
@@ -123,8 +121,9 @@ router.patch('/:id', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res, next) => {
 	try {
 		const evictionId = req.params.id;
-		const eviction = await deleteEviction(evictionId);
-		res.send(eviction)
+		const username = extractUsernameFromAuthHeaderToken(req.headers)
+		await deleteEviction(evictionId);
+		res.send(getEvictionsByUser(username))
 	} catch (err) {
 		res.status(501);
 		res.send({ error: 'Forbidden' });
