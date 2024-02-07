@@ -43,13 +43,12 @@ const evictionsSchema = new mongoose.Schema({
 	}
 }, { timestamps: true });
 
-evictionsSchema.index({ tenantName: "text", tenantPhone: "text", tenantEmail: "text" });
-
-export const Eviction = mongoose.model("Eviction", evictionsSchema);
-
 const confirmEvictionsSchema = evictionsSchema.clone()
+
+evictionsSchema.index({ tenantName: "text", tenantPhone: "text", tenantEmail: "text" });
 confirmEvictionsSchema.index({ "createdAt": 1 }, { expireAfterSeconds: 60 * 60 * 24 })
 
+export const Eviction = mongoose.model("Eviction", evictionsSchema);
 export const ConfirmEviction = mongoose.model("ConfirmEviction", confirmEvictionsSchema);
 
 export async function addEviction(
