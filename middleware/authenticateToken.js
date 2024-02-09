@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { readFile } from 'fs/promises'
+import { getTokenSecret } from '../lib/jwtHelper.js'
 
 export async function authenticateToken(req, res, next) {
 	const authHeader = req.headers['authorization']
@@ -7,13 +8,9 @@ export async function authenticateToken(req, res, next) {
 
 	if (token == null) return res.sendStatus(401)
 
-	const TOKEN_SECRET = await readFile(
-		process.env.TOKEN_SECRET_FILE
-	)
-
 	jwt.verify(
 		token,
-		TOKEN_SECRET,
+		getTokenSecret(),
 		(err, user) => {
 			if (err) {
 				console.log(err)
