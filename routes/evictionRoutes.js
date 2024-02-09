@@ -14,7 +14,7 @@ import {
 	getUseridFromToken
 } from '../lib/jwtHelper.js';
 
-var router = Router();
+let router = Router();
 
 /* GET eviction listing. */
 router.get('/:id', authenticateToken, async (req, res) => {
@@ -78,7 +78,8 @@ router.post('/', authenticateToken, async (req, res) => {
 /* POST - create eviction */
 router.post('/confirm/', authenticateToken, async (req, res) => {
 	try {
-		const userid = getUseridFromToken(extractTokenFromAuthHeader(req.headers));
+		const userid = getUseridFromToken(
+			extractTokenFromAuthHeader(req.headers));
 		const evictionId = await addConfirmEviction(
 			req.body.tenantName,
 			req.body.tenantPhone,
