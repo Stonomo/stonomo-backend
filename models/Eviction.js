@@ -30,11 +30,13 @@ const evictionsSchema = new mongoose.Schema({
 	},
 	details: {
 		type: String,
-		required: true
+		required: true,
+		index: true
 	},
 	evictedOn: {
 		type: Date,
-		required: true
+		required: true,
+		index: true
 	},
 	testData: {
 		type: Boolean,
@@ -117,10 +119,17 @@ export async function getEvictionByIdLean(id) {
 	return e;
 }
 
+export async function countEvictionsByUser(username) {
+	const { _id } = await getUserByUsername(username);
+	const e = await Eviction.countDocuments({ user: _id })
+		.populate('user', 'facilityName facilityPhone')
+		.populate('reason', 'desc');
+	return e;
+}
+
 export async function getEvictionsByUser(username) {
 	const { _id } = await getUserByUsername(username);
-	const id = _id;
-	const e = await Eviction.find({ user: id })
+	const e = await Eviction.find({ user: _id })
 		.populate('user', 'facilityName facilityPhone')
 		.populate('reason', 'desc');
 	return e;
@@ -181,6 +190,25 @@ export async function populateSampleEvictions() {
 			});
 		}
 	}
-	console.log("-Writing eviction data to db")
+	console.log("-Writing eviction data to db");
 	await Eviction.bulkWrite(evictionArray);
+
+	console.log("-Configuring sample data")
+
+	const testuserEvictions = await countEvictionsByUser('test-user');
+	if (testuserEvictions < 10) {
+		const testuserId = getUserByUsername('test-user')._id
+		Eviction.updateMany(
+			{
+				$expr: {
+					$lt: [{ $rand: {} }, 0.1]
+				}
+			},
+			[{
+				$set: {
+					user: testuserId
+				}
+			}]
+		)
+	};
 }
