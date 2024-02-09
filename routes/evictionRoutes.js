@@ -11,7 +11,8 @@ import {
 import { authenticateToken } from '../middleware/authenticateToken.js';
 import {
 	extractTokenFromAuthHeader,
-	getUseridFromToken
+	getUseridFromToken,
+	getUsernameFromToken
 } from '../lib/jwtHelper.js';
 
 let router = Router();
@@ -45,7 +46,7 @@ router.get('/confirm/:id', authenticateToken, async (req, res) => {
 /* GET eviction listings by reporting user. */
 router.post('/by-user', authenticateToken, async (req, res) => {
 	try {
-		const username = extractUsernameFromAuthHeaderToken(req.headers)
+		const username = getUsernameFromToken(extractTokenFromAuthHeader(req.headers))
 		var evictions = await getEvictionsByUser(username);
 		res.send(evictions);
 	} catch (err) {
