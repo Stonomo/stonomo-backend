@@ -14,12 +14,12 @@ export async function authenticateToken(req, res, next) {
 		(err, user) => {
 			if (err) {
 				console.log(err)
-				return res.sendStatus(403)
+				return res.sendStatus(403);
 			}
 
-			req.user = user
+			req.user = user;
 
-			next()
+			next();
 		}
 	)
 }
