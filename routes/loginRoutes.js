@@ -2,7 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 
 import { getUserByUsername } from '../models/User.js';
-import { generateAccessToken } from '../lib/jwtHelper.js';
+import { generateAccessToken, generateRefreshToken } from '../lib/jwtHelper.js';
 
 var router = Router();
 
@@ -19,8 +19,18 @@ router.post('/login', async (req, res) => {
 		// Compare passwords
 		const result = await bcrypt.compare(req.body.password, user.passHash);
 		if (result) {
-			const token = await generateAccessToken(user);
-			return res.json({ token: token });
+			const authToken = await generateAccessToken(user);
+			const refreshToken = await generateRefreshToken(user);
+
+			res.cookie('stonomoToken', authToken, {
+				secure: process.env.NODE_ENV !== "development",
+				httpOnly: true,
+				signed: true,
+				sameSite: "strict",
+				maxAge: 1000 * 60 * 60
+			});
+
+			return res.json(refreshToken);
 		}
 		return res.status(401).json({ message: "Invalid Credentials" });
 	} catch (err) {

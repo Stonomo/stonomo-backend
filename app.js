@@ -8,11 +8,12 @@ import cookieParser from 'cookie-parser';
 import lessMiddleware from 'less-middleware';
 import logger from 'morgan';
 import mongoose from 'mongoose';
-
+import requestMethods from './middleware/requestMethods.js';
 import * as routers from './routes.js';
 import { populateReasons } from './models/Reason.js';
 import { populateSampleUsers } from './models/User.js';
 import { populateSampleEvictions } from './models/Eviction.js';
+import { getTokenSecret } from './lib/jwtHelper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,12 +29,14 @@ console.log("Configuring Express");
 app.set('views', join(__dirname, 'views'));
 
 app.use(logger('dev'));
+app.use(requestMethods);
 app.use(cors({
 	origin: ['http://localhost:3000', 'http://localhost:5173'],
+	credentials: true,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser(getTokenSecret()));
 app.use(lessMiddleware(join(__dirname, 'public')));
 app.use(express.static(join(__dirname, 'public')));
 

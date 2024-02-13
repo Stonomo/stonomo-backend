@@ -1,12 +1,12 @@
 import jwt from 'jsonwebtoken'
-import { readFile } from 'fs/promises'
 import { getTokenSecret } from '../lib/jwtHelper.js'
 
 export async function authenticateToken(req, res, next) {
-	const authHeader = req.headers['authorization']
-	const token = authHeader && authHeader.split(' ')[1]
+	// const authHeader = req.headers['authorization']
+	// const token = authHeader && authHeader.split(' ')[1]
+	const token = req.signedCookies?.stonomoToken;
 
-	if (token == null) return res.sendStatus(401)
+	if (token == null) { console.log("null token"); return res.sendStatus(401); }
 
 	jwt.verify(
 		token,
