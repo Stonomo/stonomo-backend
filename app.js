@@ -9,7 +9,7 @@ import lessMiddleware from 'less-middleware';
 import logger from 'morgan';
 import mongoose from 'mongoose';
 import requestMethods from './middleware/requestMethods.js';
-import * as routers from './routes.js';
+import routers from './routes/routers.js';
 import { populateReasons } from './models/Reason.js';
 import { populateSampleUsers } from './models/User.js';
 import { populateSampleEvictions } from './models/Eviction.js';
