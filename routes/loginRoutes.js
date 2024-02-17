@@ -26,8 +26,8 @@ router.post('/login', async (req, res) => {
 				secure: process.env.NODE_ENV !== "development",
 				httpOnly: true,
 				signed: true,
-				sameSite: "strict",
-				maxAge: 1000 * 60 * 60
+				sameSite: 'lax',
+				maxAge: 1000 * 60 * 60 // One hour TTL
 			});
 
 			return res.json(refreshToken);
