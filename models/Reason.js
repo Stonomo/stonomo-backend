@@ -1,9 +1,5 @@
 import mongoose from 'mongoose';
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
-//TODO: add indexing
 const reasonSchema = new mongoose.Schema({
     label: { type: String, select: true, required: true, index: true },
     desc: { type: String, select: true, required: true, index: true },
@@ -16,7 +12,7 @@ const allReasonsQuery = Reason.find();
 const enabledReasonsQuery = allReasonsQuery.nor({ enabled: false });
 
 export async function addReason(lbl, desc) {
-    // call replaceOne to prevent duplicate reasons accumulating with app restarts
+    // TODO: call replaceOne to prevent duplicate reasons accumulating with app restarts
     let reason = Reason.create({ label: lbl, desc: desc, enabled: true });
     return reason;
 }
@@ -29,7 +25,7 @@ export async function populateReasons() {
         reasonArray.push({
             replaceOne: {
                 upsert: true,
-                filter: { label: reason.label },
+                filter: { _id: reason._id.$oid },
                 replacement: {
                     label: reason.label,
                     desc: reason.desc,
