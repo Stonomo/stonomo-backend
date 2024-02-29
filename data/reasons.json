@@ -1,6 +1,22 @@
-{
-    "NON-PAYMENT": "Non-payment of rent and/or other charges, as applicable",
-    "THEFT": "Stole from facility or unit(s)",
-    "BREAK-IN": "Entered/Broke into facility or unit(s) without authorization",
-    "OTHER LEASE VIOLATION": "Other reason - See details"
-}
+[
+    {
+        "label": "NON-PAYMENT",
+        "desc": "Non-payment of assigned rent and/or other charges"
+    },
+    {
+        "label": "THEFT",
+        "desc": "Stole from facility or unit(s)"
+    },
+    {
+        "label": "BREAK-IN",
+        "desc": "Entered/Broke into facility or unit(s) without authorization"
+    },
+    {
+        "label": "LIVED IN UNIT",
+        "desc": "Lived in unit/Attempted to live in unit"
+    },
+    {
+        "label": "OTHER LEASE VIOLATION",
+        "desc": "Other reason - See details"
+    }
+]

@@ -22,18 +22,17 @@ export async function addReason(lbl, desc) {
 }
 
 export async function populateReasons() {
-    const reasonDict = require('../data/reasons.json');
+    const reasonDict = await import('../data/reasons.json', { with: { type: "json" } });
 
     const reasonArray = []
-    for (const reason in reasonDict) {
-        const description = reasonDict[reason];
+    for (const reason of reasonDict['default']) {
         reasonArray.push({
             replaceOne: {
                 upsert: true,
-                filter: { label: reason },
+                filter: { label: reason.label },
                 replacement: {
-                    label: reason,
-                    desc: description,
+                    label: reason.label,
+                    desc: reason.desc,
                     enabled: true
                 }
             }
