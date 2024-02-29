@@ -102,19 +102,24 @@ router.post('/confirm/', authenticateToken, async (req, res) => {
 router.patch('/:id', authenticateToken, async (req, res) => {
 	try {
 		const evictionId = req.params.id
-		var eviction = await getEvictionById(evictionId);
+		let eviction = await getEvictionById(evictionId);
+		const userId = getUseridFromToken(getTokenFromCookies(req));
 
-		// TODO: compare username from jwt to username in eviction and reject if mismatched
+		if (eviction.user._id !== userId) {
+			res.status(403);
+			res.send({ error: 'Forbidden' });
+		} else {
+			let save = false
+			if (req.body.details) {
+				eviction.details[eviction.details.length] = req.body.details;
+				save = true;
+			}
 
-		// if (req.body.tenantName) { eviction.tenantName = req.body.tenantName }
-		// if (req.body.tenantPhone) { eviction.tenantPhone = req.body.tenantPhone }
-		// if (req.body.tenantEmail) { eviction.tenantEmail = req.body.tenantEmail }
-		// if (req.body.reason) { eviction.reason = req.body.reason }
-		if (req.body.details) { eviction.details += '\n\n' + req.body.details }
-		// if (req.body.evictedOn) { eviction.evictedOn = req.body.evictedOn }
-
-		await eviction.save();
-		res.send(eviction);
+			if (save) {
+				await eviction.save();
+			}
+			res.send(eviction);
+		}
 	} catch (err) {
 		res.status(404);
 		res.send({ error: 'Record not found. ' + err });
@@ -126,7 +131,7 @@ router.patch('/:id', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res, next) => {
 	try {
 		const evictionId = req.params.id;
-		const username = extractUsernameFromAuthHeaderToken(req.headers)
+		const username = getUsernameFromToken(getTokenFromCookies(req));
 		await deleteEviction(evictionId);
 		res.send(getEvictionsByUser(username))
 	} catch (err) {
