@@ -56,15 +56,15 @@ app.use('/v1/evictions', routers.evictionRouter);
 // app.use('/tc', routers.testClientRouter);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
 	next(createError(404));
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
 	// set locals, only providing error in development
 	res.locals.message = err.message;
-	res.locals.error = req.app.get('env') === 'development' ? err : {};
+	res.locals.error = process.env.NODE_ENV === 'development' ? err : {};
 
 	// render the error page
 	res.status(err.status || 500);
@@ -78,7 +78,10 @@ console.log("Connecting to Database");
 
 let connectStatus;
 try {
-	connectStatus = await mongoose.connect(process.env.MONGODB_URI);
+	const mongooseOptions = {
+		autoIndex: process.env.NODE_ENV === 'development', // only build indexes on development
+	};
+	connectStatus = await mongoose.connect(process.env.MONGODB_URI, mongooseOptions);
 } catch (err) {
 	console.log('Failed to connect to MongoDB');
 	console.log(err);
