@@ -1,6 +1,14 @@
 import mongoose from 'mongoose';
 import { getUserByUsername } from './User.js';
 
+const evictionDetailsSchema = new mongoose.Schema({
+	content: {
+		type: String,
+		required: true,
+		index: true
+	}
+}, { timestamps: true })
+
 //TODO: add validation and error handling
 const evictionsSchema = new mongoose.Schema({
 	tenantName: {
@@ -29,7 +37,7 @@ const evictionsSchema = new mongoose.Schema({
 		index: true
 	},
 	details: {
-		type: String,
+		type: [evictionDetailsSchema],
 		required: true,
 		index: true
 	},
@@ -47,7 +55,7 @@ const evictionsSchema = new mongoose.Schema({
 
 const confirmEvictionsSchema = evictionsSchema.clone()
 
-evictionsSchema.index({ tenantName: "text", tenantPhone: "text", tenantEmail: "text" });
+evictionsSchema.index({ tenantName: "text" });
 confirmEvictionsSchema.index({ "createdAt": 1 }, { expireAfterSeconds: 60 * 60 * 24 })
 
 export const Eviction = mongoose.model("Eviction", evictionsSchema);
@@ -148,14 +156,18 @@ export function updateEviction(id, ...fields) {
 	return e;
 }
 
-export async function searchForEviction(textSearchParams) {
-	// TODO: change to use regex on tenant fields
-	const e = await Eviction.find({ $text: { $search: textSearchParams } })
-		.populate('user', 'facilityName facilityPhone')
-		.populate('reason', 'desc')
-		// .limit(10)
-		.lean();
-	//search Evictions by querying Eviction
+export async function searchForEviction(tenantName, tenantPhone, tenantEmail) {
+	//TODO: rewrite db call to match on any of name, phone, email and return the record(s)
+	const e = await Eviction.find({
+		$or: [
+			{ tenantName: tenantName },
+			{ tenantPhone: tenantPhone },
+			{ tenantEmail: tenantEmail }
+		]
+	})
+		.populate('user', 'facilityName')
+		.lean(); // lean bc we aren't updating anything
+
 	return e;
 }
 
@@ -169,26 +181,24 @@ export async function populateSampleEvictions() {
 	const mockEvictionData = await import('../data/MOCKevictions.json', { with: { type: "json" } });
 	console.log("-Transforming eviction data")
 	const evictionArray = []
-	for (const ix in mockEvictionData) {
-		const evics = mockEvictionData[ix]
-		for (const evic of evics) {
-			evictionArray.push({
-				replaceOne: {
-					upsert: true,
-					filter: { _id: evic._id.$oid },
-					replacement: {
-						tenantName: evic.tenantName,
-						tenantPhone: evic.tenantPhone,
-						tenantEmail: evic.tenantEmail,
-						user: evic.user.$oid,
-						reason: evic.reason.$oid,
-						details: evic.details,
-						evictedOn: evic.evictedOn,
-						testData: true
-					}
+	const evics = mockEvictionData['default']
+	for (const evic of evics) {
+		evictionArray.push({
+			replaceOne: {
+				upsert: true,
+				filter: { _id: evic._id.$oid },
+				replacement: {
+					tenantName: evic.tenantName,
+					tenantPhone: evic.tenantPhone,
+					tenantEmail: evic.tenantEmail,
+					user: evic.user.$oid,
+					reason: evic.reason.$oid,
+					details: evic.details,
+					evictedOn: evic.evictedOn,
+					testData: true
 				}
-			});
-		}
+			}
+		});
 	}
 	console.log("-Writing eviction data to db");
 	await Eviction.bulkWrite(evictionArray);
