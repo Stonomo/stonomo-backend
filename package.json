@@ -15,7 +15,7 @@
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
     "less-middleware": "^3.1.0",
-    "mongoose": "^8.1.0",
+    "mongoose": "^8.2.0",
     "morgan": "^1.10.0",
     "uuid": "^9.0.1",
     "validator": "^13.11.0"
