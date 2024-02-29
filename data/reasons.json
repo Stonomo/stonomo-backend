@@ -1,21 +1,36 @@
 [
     {
+        "_id": {
+            "$oid": "65e0ca9434cf5b51b999fe1e"
+        },
         "label": "NON-PAYMENT",
         "desc": "Non-payment of assigned rent and/or other charges"
     },
     {
+        "_id": {
+            "$oid": "65e0ca9434cf5b51b999fe1f"
+        },
         "label": "THEFT",
         "desc": "Stole from facility or unit(s)"
     },
     {
+        "_id": {
+            "$oid": "65e0ca9434cf5b51b999fe20"
+        },
         "label": "BREAK-IN",
         "desc": "Entered/Broke into facility or unit(s) without authorization"
     },
     {
+        "_id": {
+            "$oid": "65e0ca9434cf5b51b999fe21"
+        },
         "label": "LIVED IN UNIT",
         "desc": "Lived in unit/Attempted to live in unit"
     },
     {
+        "_id": {
+            "$oid": "65e0ca9434cf5b51b999fe22"
+        },
         "label": "OTHER LEASE VIOLATION",
         "desc": "Other reason - See details"
     }
