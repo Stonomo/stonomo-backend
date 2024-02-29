@@ -29,6 +29,13 @@
     },
     {
         "_id": {
+            "$oid": "65e0ca9434cf5b51b999fe23"
+        },
+        "label": "ILLEGAL ACTIVITY",
+        "desc": "Conducted illegal activity on premises"
+    },
+    {
+        "_id": {
             "$oid": "65e0ca9434cf5b51b999fe22"
         },
         "label": "OTHER LEASE VIOLATION",
