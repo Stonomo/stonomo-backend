@@ -86,7 +86,7 @@ router.post('/confirm/', authenticateToken, async (req, res) => {
 			req.body.tenantEmail,
 			userid,
 			req.body.reason,
-			req.body.details, //TODO: convert to nested document with multiple entries and timestamps for each
+			req.body.details,
 			req.body.evictedOn
 		);
 		res.send(evictionId);
@@ -102,20 +102,15 @@ router.post('/confirm/', authenticateToken, async (req, res) => {
 router.patch('/:id', authenticateToken, async (req, res) => {
 	try {
 		const evictionId = req.params.id
-		let eviction = await getEvictionById(evictionId);
 		const userId = getUseridFromToken(getTokenFromCookies(req));
+		let eviction = await getEvictionById(evictionId);
 
-		if (eviction.user._id !== userId) {
+		if (eviction.user._id.toString() !== userId) {
 			res.status(403);
 			res.send({ error: 'Forbidden' });
 		} else {
-			let save = false
 			if (req.body.details) {
-				eviction.details[eviction.details.length] = req.body.details;
-				save = true;
-			}
-
-			if (save) {
+				eviction.details.push({ content: req.body.details });
 				await eviction.save();
 			}
 			res.send(eviction);

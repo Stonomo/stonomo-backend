@@ -4,8 +4,7 @@ import { getUserByUsername } from './User.js';
 const evictionDetailsSchema = new mongoose.Schema({
 	content: {
 		type: String,
-		required: true,
-		index: true
+		required: true
 	}
 }, { timestamps: true })
 
@@ -76,7 +75,9 @@ export async function addEviction(
 		tenantEmail: tenantEmail,
 		user: user,
 		reason: reason,
-		details: details,
+		details: [{
+			content: details
+		}],
 		evictedOn: evictedOn,
 		testData: false
 	});
@@ -98,10 +99,13 @@ export async function addConfirmEviction(
 		tenantEmail: tenantEmail,
 		user: user,
 		reason: reason,
-		details: details,
 		evictedOn: evictedOn,
-		testData: false
+		testData: false,
+		details: [{
+			content: details
+		}]
 	});
+	e.details.push({ content: details })
 	return e._id.toString();
 }
 
@@ -156,16 +160,16 @@ export function updateEviction(id, ...fields) {
 	return e;
 }
 
-export async function searchForEviction(tenantName, tenantPhone, tenantEmail) {
-	//TODO: rewrite db call to match on any of name, phone, email and return the record(s)
+export async function searchForEviction(searchName, searchPhone, searchEmail) {
 	const e = await Eviction.find({
 		$or: [
-			{ tenantName: tenantName },
-			{ tenantPhone: tenantPhone },
-			{ tenantEmail: tenantEmail }
+			{ tenantName: searchName },
+			{ tenantPhone: searchPhone },
+			{ tenantEmail: searchEmail }
 		]
 	})
-		.populate('user', 'facilityName')
+		.populate({ path: 'user', select: 'facilityName -_id' })
+		.populate({ path: 'reason', select: 'desc -_id' })
 		.lean(); // lean bc we aren't updating anything
 
 	return e;
