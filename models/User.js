@@ -89,25 +89,24 @@ export async function populateSampleUsers() {
 	const mockUserData = await import('../data/MOCKusers.json', { with: { type: "json" } });
 	console.log("-Transforming user data")
 	const userArray = []
-	for (const ix in mockUserData) {
-		const users = mockUserData[ix]
-		for (const user of users) {
-			userArray.push({
-				replaceOne: {
-					upsert: true,
-					filter: { username: user.username },
-					replacement: {
-						username: user.username,
-						passHash: user.passHash,
-						facilityName: user.facilityName,
-						facilityAddress: user.facilityAddress,
-						facilityPhone: user.facilityPhone,
-						facilityEmail: user.facilityEmail,
-						testData: true
-					}
+	const users = mockUserData['default']
+	for (const user of users) {
+		userArray.push({
+			replaceOne: {
+				upsert: true,
+				filter: { _id: user._id.$oid },
+				replacement: {
+					username: user.username,
+					passHash: user.passHash,
+					facilityName: user.facilityName,
+					facilityAddress: user.facilityAddress,
+					facilityPhone: user.facilityPhone,
+					facilityEmail: user.facilityEmail,
+					testData: true
 				}
-			});
-		}
+			}
+		});
+
 	}
 	console.log("-Writing user data to db")
 	await User.bulkWrite(userArray);
