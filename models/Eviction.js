@@ -47,7 +47,6 @@ const evictionsSchema = new mongoose.Schema({
 	},
 	testData: {
 		type: Boolean,
-		required: true,
 		default: false
 	}
 }, { timestamps: true });
@@ -75,11 +74,10 @@ export async function addEviction(
 		tenantEmail: tenantEmail,
 		user: user,
 		reason: reason,
+		evictedOn: evictedOn,
 		details: [{
 			content: details
-		}],
-		evictedOn: evictedOn,
-		testData: false
+		}]
 	});
 	return e._id.toString();
 }
