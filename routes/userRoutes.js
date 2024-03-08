@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { User, getUserById, getUserByUsername, updateUser } from '../models/User.js';
 import bcrypt from 'bcrypt';
 import { authenticateToken } from '../middleware/authenticateToken.js';
-import { getTokenFromCookies, getUsernameFromToken } from '../lib/jwtHelper.js';
+import { getTokenFromCookies, getUseridFromToken } from '../lib/jwtHelper.js';
 
 var router = Router();
 const saltRounds = 10;
@@ -10,8 +10,8 @@ const saltRounds = 10;
 /* GET user's own user record. */
 router.get('/', authenticateToken, async (req, res) => {
 	try {
-		const username = getUsernameFromToken(getTokenFromCookies(req));
-		var user = await getUserByUsername(username);
+		const userId = getUseridFromToken(getTokenFromCookies(req));
+		var user = await getUserById(userId);
 		res.send(user);
 	} catch (err) {
 		res.status(404);
@@ -21,10 +21,10 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 /* GET user record. */
-router.get('/:username', authenticateToken, async (req, res) => {
+router.get('/:userId', authenticateToken, async (req, res) => {
 	try {
-		const username = req.params.username;
-		var user = await getUserByUsername(username);
+		const userId = req.params.userId;
+		var user = await getUserById(userId);
 		res.send(user);
 	} catch {
 		res.status(404);
@@ -40,7 +40,7 @@ router.post('/', authenticateToken, async (req, res) => {
 		let checkExists = await getUserByUsername(req.body.username);
 
 		if (checkExists) {
-			res.status(401).json({ message: "Email is already in use." });
+			res.status(401).json({ message: "username is already in use." });
 			return;
 		}
 		if (err) throw new Error('Internal Server Error');
