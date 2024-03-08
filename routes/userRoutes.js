@@ -2,12 +2,25 @@ import { Router } from 'express';
 import { User, getUserById, getUserByUsername, updateUser } from '../models/User.js';
 import bcrypt from 'bcrypt';
 import { authenticateToken } from '../middleware/authenticateToken.js';
+import { getTokenFromCookies, getUsernameFromToken } from '../lib/jwtHelper.js';
 
 var router = Router();
 const saltRounds = 10;
 
+/* GET user's own user record. */
+router.get('/', authenticateToken, async (req, res) => {
+	try {
+		const username = getUsernameFromToken(getTokenFromCookies(req));
+		var user = await getUserByUsername(username);
+		res.send(user);
+	} catch (err) {
+		res.status(404);
+		res.send({ error: 'User does not exist ' + err.message });
+	}
+
+});
+
 /* GET user record. */
-// TODO needs to check :auth
 router.get('/:username', authenticateToken, async (req, res) => {
 	try {
 		const username = req.params.username;
@@ -21,7 +34,6 @@ router.get('/:username', authenticateToken, async (req, res) => {
 });
 
 /* POST - create user */
-// TODO: needs to check :auth
 router.post('/', authenticateToken, async (req, res) => {
 	try {
 		const hash = await bcrypt.hash(req.body.password, saltRounds);
@@ -50,7 +62,6 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 /* PATCH - update user (user- and admin-only) */
-// TODO: needs to check :auth
 router.patch('/:username', authenticateToken, async (req, res) => {
 	try {
 		const saltRounds = 10;
@@ -83,7 +94,6 @@ router.patch('/:username', authenticateToken, async (req, res) => {
 });
 
 /* DELETE - remove user (admin only) */
-// TODO: add :auth check
 router.delete('/:id', authenticateToken, function (req, res, next) {
 	// No-op for now
 	res.status(403);
