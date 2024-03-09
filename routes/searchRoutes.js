@@ -7,7 +7,7 @@ let router = Router();
 router.post('/', authenticateToken, async (req, res) => {
 	try {
 		let searchName = req.body.searchName.trim();
-		let searchPhone = req.body.searchPhone.trim();
+		let searchPhone = req.body.searchPhone?.trim();
 		let searchEmail = req.body.searchEmail?.trim();
 		let results = await searchForEviction(searchName, searchPhone, searchEmail);
 		res.send(results);
