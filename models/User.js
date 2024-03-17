@@ -3,6 +3,35 @@ import validator from 'validator';
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
+const addressSchema = mongoose.Schema({
+	street1: {
+		type: String,
+		required: true,
+	},
+	street2: {
+		type: String,
+		required: false,
+	},
+	street3: {
+		type: String,
+		required: false,
+	},
+	city: {
+		type: String,
+		required: true,
+		select: true,
+	},
+	state: {
+		type: String,
+		required: true,
+		select: true,
+	},
+	zip: {
+		type: String,
+		required: true
+	}
+})
+
 const userSchema = mongoose.Schema({
 	username: {
 		type: String,
@@ -20,7 +49,7 @@ const userSchema = mongoose.Schema({
 		select: true
 	},
 	facilityAddress: {
-		type: String,
+		type: addressSchema,
 		required: true
 	},
 	facilityPhone: {
@@ -42,6 +71,7 @@ const userSchema = mongoose.Schema({
 export const User = mongoose.model('User', userSchema);
 
 export function addUser(username, pass_hash, facilityName, facilityAddress, facilityPhone, facilityEmail) {
+	//TODO: parse facilityAddress as string into subdocument
 	let u = User.create(username, pass_hash, facilityName, facilityAddress, facilityPhone, facilityEmail)
 		.then(console.log);
 	return u;
@@ -76,13 +106,12 @@ export async function updateUser(id, fields) {
 	return getUserByIdLean(id);
 }
 
-// //TODO: delete function needs to be protected for security reasons
-// export function __deleteUser(id) {
-// 	let u = User.findByIdAndDelete(id)
-// 		.lean()
-// 		.then(console.log);
-// 	return u;
-// }
+export function deleteUser(id) {
+	let u = User.findByIdAndDelete(id)
+		.lean()
+		.then(console.log);
+	return u;
+}
 
 export async function populateSampleUsers() {
 	console.log("-Importing sample users")
