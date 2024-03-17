@@ -10,9 +10,8 @@ import {
 } from '../models/Eviction.js';
 import { authenticateToken } from '../middleware/authenticateToken.js';
 import {
-	getTokenFromCookies,
-	getUseridFromToken,
-	getUsernameFromToken
+	getTokenFromRequest,
+	getUseridFromToken
 } from '../lib/jwtHelper.js';
 
 let router = Router();
@@ -46,8 +45,8 @@ router.get('/confirm/:id', authenticateToken, async (req, res) => {
 /* GET eviction listings by reporting user. */
 router.post('/by-user', authenticateToken, async (req, res) => {
 	try {
-		const username = getUsernameFromToken(getTokenFromCookies(req))
-		var evictions = await getEvictionsByUser(username);
+		const userId = getUseridFromToken(getTokenFromRequest(req))
+		const evictions = await getEvictionsByUser(userId);
 		res.send(evictions);
 	} catch (err) {
 		res.status(404);
@@ -59,7 +58,7 @@ router.post('/by-user', authenticateToken, async (req, res) => {
 /* POST - create eviction */
 router.post('/', authenticateToken, async (req, res) => {
 	try {
-		const userid = getUseridFromToken(getTokenFromCookies(req));
+		const userid = getUseridFromToken(getTokenFromRequest(req));
 		const eviction = await addEviction(
 			req.body.tenantName,
 			req.body.tenantPhone,
@@ -79,7 +78,7 @@ router.post('/', authenticateToken, async (req, res) => {
 /* POST - create eviction */
 router.post('/confirm/', authenticateToken, async (req, res) => {
 	try {
-		const userid = getUseridFromToken(getTokenFromCookies(req));
+		const userid = getUseridFromToken(getTokenFromRequest(req));
 		const evictionId = await addConfirmEviction(
 			req.body.tenantName,
 			req.body.tenantPhone,
@@ -102,7 +101,7 @@ router.post('/confirm/', authenticateToken, async (req, res) => {
 router.patch('/:id', authenticateToken, async (req, res) => {
 	try {
 		const evictionId = req.params.id
-		const userId = getUseridFromToken(getTokenFromCookies(req));
+		const userId = getUseridFromToken(getTokenFromRequest(req));
 		let eviction = await getEvictionById(evictionId);
 
 		if (eviction.user._id.toString() !== userId) {
@@ -113,7 +112,7 @@ router.patch('/:id', authenticateToken, async (req, res) => {
 				eviction.details.push({ content: req.body.details });
 				await eviction.save();
 			}
-			res.send(eviction);
+			res.send(eviction._id);
 		}
 	} catch (err) {
 		res.status(404);
@@ -126,12 +125,18 @@ router.patch('/:id', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res, next) => {
 	try {
 		const evictionId = req.params.id;
-		const username = getUsernameFromToken(getTokenFromCookies(req));
-		await deleteEviction(evictionId);
-		res.send(getEvictionsByUser(username))
+		const userId = getUseridFromToken(getTokenFromRequest(req));
+		const eviction = await getEvictionById(evictionId);
+		if (userId === eviction.user._id.toString()) {
+			const deletedId = await deleteEviction(evictionId);
+			res.send(deletedId);
+		}
+		else {
+			throw new Error('Only the reporting facility can delete this eviction')
+		}
 	} catch (err) {
-		res.status(501);
-		res.send({ error: 'Forbidden' });
+		res.status(403);
+		res.send({ error: 'Forbidden. ' + err.message });
 	}
 });
 
