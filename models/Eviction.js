@@ -37,7 +37,6 @@ const evictionsSchema = new mongoose.Schema({
 	},
 	details: {
 		type: [evictionDetailsSchema],
-		required: true,
 		index: true
 	},
 	evictedOn: {
@@ -137,9 +136,8 @@ export async function countEvictionsByUser(username) {
 	return e;
 }
 
-export async function getEvictionsByUser(username) {
-	const { _id } = await getUserByUsername(username);
-	const e = await Eviction.find({ user: _id })
+export async function getEvictionsByUser(userId) {
+	const e = await Eviction.find({ user: userId })
 		.populate('user', 'facilityName facilityPhone')
 		.populate('reason', 'desc');
 	return e;
@@ -155,7 +153,7 @@ export function updateEviction(id, ...fields) {
 
 	let e = Eviction.findByIdAndUpdate(id, { $set: updateParams })
 		.lean();
-	return e;
+	return e._id;
 }
 
 export async function searchForEviction(searchName, searchPhone, searchEmail) {
@@ -165,9 +163,9 @@ export async function searchForEviction(searchName, searchPhone, searchEmail) {
 			{ tenantPhone: searchPhone },
 			{ tenantEmail: searchEmail }
 		]
-	})
-		.populate({ path: 'user', select: 'facilityName -_id' })
-		.populate({ path: 'reason', select: 'desc -_id' })
+	}, { _id: 1, tenantName: 1, user: 1, reason: 1 })
+		.populate({ path: 'user', select: 'facilityName _id -username -facilityPhone' })
+		.populate({ path: 'reason', select: 'desc -_id -label' })
 		.lean(); // lean bc we aren't updating anything
 
 	return e;
