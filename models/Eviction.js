@@ -108,21 +108,21 @@ export async function addConfirmEviction(
 
 export async function getEvictionById(id) {
 	let e = await Eviction.findById(id)
-		.populate('user', 'facilityName facilityPhone')
+		.populate('user', 'facilityName')
 		.populate('reason', 'desc');
 	return e;
 }
 
 export async function getConfirmEvictionById(id) {
 	let e = await ConfirmEviction.findById(id)
-		.populate('user', 'facilityName facilityPhone')
+		.populate('user', 'facilityName')
 		.populate('reason', 'desc');
 	return e;
 }
 
 export async function getEvictionByIdLean(id) {
 	let e = await Eviction.findById(id)
-		.populate('user', 'facilityName facilityPhone')
+		.populate('user', 'facilityName')
 		.populate('reason', 'desc')
 		.lean();
 	return e;
@@ -131,15 +131,14 @@ export async function getEvictionByIdLean(id) {
 export async function countEvictionsByUser(username) {
 	const { _id } = await getUserByUsername(username);
 	const e = await Eviction.countDocuments({ user: _id })
-		.populate('user', 'facilityName facilityPhone')
-		.populate('reason', 'desc');
 	return e;
 }
 
 export async function getEvictionsByUser(userId) {
-	const e = await Eviction.find({ user: userId })
-		.populate('user', 'facilityName facilityPhone')
-		.populate('reason', 'desc');
+	const e = await Eviction.find({ user: userId }, { _id: 1, tenantName: 1, user: 1 })
+		.populate({ path: 'user', select: 'facilityName _id -username -facilityPhone' })
+		.populate({ path: 'reason', select: 'desc -_id -label' })
+		.lean();
 	return e;
 }
 
@@ -163,7 +162,7 @@ export async function searchForEviction(searchName, searchPhone, searchEmail) {
 			{ tenantPhone: searchPhone },
 			{ tenantEmail: searchEmail }
 		]
-	}, { _id: 1, tenantName: 1, user: 1, reason: 1 })
+	}, { _id: 1, tenantName: 1, user: 1 })
 		.populate({ path: 'user', select: 'facilityName _id -username -facilityPhone' })
 		.populate({ path: 'reason', select: 'desc -_id -label' })
 		.lean(); // lean bc we aren't updating anything
