@@ -116,7 +116,8 @@ export async function getEvictionById(id) {
 export async function getConfirmEvictionById(id) {
 	let e = await ConfirmEviction.findById(id)
 		.populate('user', 'facilityName')
-		.populate('reason', 'desc');
+		.populate('reason', 'desc')
+		.lean();
 	return e;
 }
 
@@ -128,9 +129,8 @@ export async function getEvictionByIdLean(id) {
 	return e;
 }
 
-export async function countEvictionsByUser(username) {
-	const { _id } = await getUserByUsername(username);
-	const e = await Eviction.countDocuments({ user: _id })
+export async function countEvictionsByUser(userId) {
+	const e = await Eviction.countDocuments({ user: userId })
 	return e;
 }
 
@@ -170,6 +170,25 @@ export async function searchForEviction(searchName, searchPhone, searchEmail) {
 	return e;
 }
 
+export async function searchEvictionsByUser(searchName, searchPhone, searchEmail, searchUserId) {
+	const e = await Eviction.find({
+		$and: [{
+			user: new mongoose.Types.ObjectId(searchUserId)
+		}, {
+			$or: [
+				{ tenantName: searchName },
+				{ tenantPhone: searchPhone },
+				{ tenantEmail: searchEmail }
+			]
+		}]
+	}, { _id: 1, tenantName: 1, user: 1 })
+		.populate({ path: 'user', select: 'facilityName _id -username -facilityPhone' })
+		.populate({ path: 'reason', select: 'desc -_id -label' })
+		.lean();
+
+	return e;
+}
+
 export async function deleteEviction(id) {
 	let e = await Eviction.findByIdAndDelete(id)
 	return e._id.toJSON();
@@ -203,15 +222,19 @@ export async function populateSampleEvictions() {
 	await Eviction.bulkWrite(evictionArray);
 
 	console.log("-Configuring sample data")
-
-	const testuserEvictions = await countEvictionsByUser('test-user');
+	const testuserId = await getUserByUsername('test-user')._id
+	const testuserEvictions = await countEvictionsByUser(testuserId);
+	// Assign 10% of test data to test-user
 	if (testuserEvictions < 10) {
-		const testuserId = getUserByUsername('test-user')._id
 		Eviction.updateMany(
 			{
-				$expr: {
-					$lt: [{ $rand: {} }, 0.1]
-				}
+				$and: [{
+					$expr: {
+						$lt: [{ $rand: {} }, 0.1]
+					}
+				}, {
+					testData: true
+				}]
 			},
 			[{
 				$set: {
