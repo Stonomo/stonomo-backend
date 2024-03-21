@@ -43,7 +43,7 @@ router.get('/confirm/:id', authenticateToken, async (req, res) => {
 });
 
 /* GET eviction listings by reporting user. */
-router.post('/by-user', authenticateToken, async (req, res) => {
+router.get('/by-user', authenticateToken, async (req, res) => {
 	try {
 		const userId = getUseridFromToken(getTokenFromRequest(req))
 		const evictions = await getEvictionsByUser(userId);
@@ -126,7 +126,7 @@ router.delete('/:id', authenticateToken, async (req, res, next) => {
 	try {
 		const evictionId = req.params.id;
 		const userId = getUseridFromToken(getTokenFromRequest(req));
-		const eviction = await getEvictionById(evictionId);
+		const eviction = await getEvictionByIdLean(evictionId);
 		if (userId === eviction.user._id.toString()) {
 			const deletedId = await deleteEviction(evictionId);
 			res.send(deletedId);
