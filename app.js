@@ -31,7 +31,7 @@ app.set('views', join(__dirname, 'views'));
 app.use(logger('dev'));
 app.use(requestMethods);
 app.use(cors({
-	origin: ['http://localhost:3000', 'http://localhost:5173'],
+	origin: ['http://localhost:8080', 'http://localhost'],
 	credentials: true,
 }));
 app.use(express.json());
