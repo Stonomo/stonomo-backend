@@ -16,6 +16,19 @@ import {
 
 let router = Router();
 
+/* GET eviction listings by reporting user. */
+router.get('/by-user', authenticateToken, async (req, res) => {
+	try {
+		const userId = getUseridFromToken(getTokenFromRequest(req))
+		const evictions = await getEvictionsByUser(userId);
+		res.send(evictions);
+	} catch (err) {
+		res.status(500);
+		res.send({ error: 'Eviction record does not exist' });
+	}
+
+});
+
 /* GET eviction listing. */
 router.get('/:id', authenticateToken, async (req, res) => {
 	try {
@@ -35,19 +48,6 @@ router.get('/confirm/:id', authenticateToken, async (req, res) => {
 		const evictionId = req.params.id
 		var eviction = await getConfirmEvictionById(evictionId);
 		res.send(eviction);
-	} catch (err) {
-		res.status(404);
-		res.send({ error: 'Eviction record does not exist' });
-	}
-
-});
-
-/* GET eviction listings by reporting user. */
-router.get('/by-user', authenticateToken, async (req, res) => {
-	try {
-		const userId = getUseridFromToken(getTokenFromRequest(req))
-		const evictions = await getEvictionsByUser(userId);
-		res.send(evictions);
 	} catch (err) {
 		res.status(404);
 		res.send({ error: 'Eviction record does not exist' });
@@ -76,7 +76,7 @@ router.post('/', authenticateToken, async (req, res) => {
 })
 
 /* POST - create eviction */
-router.post('/confirm/', authenticateToken, async (req, res) => {
+router.post('/confirm', authenticateToken, async (req, res) => {
 	try {
 		const userid = getUseridFromToken(getTokenFromRequest(req));
 		const evictionId = await addConfirmEviction(
