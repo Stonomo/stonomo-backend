@@ -62,8 +62,8 @@ export async function addEviction(
 	tenantName,
 	tenantPhone,
 	tenantEmail,
-	user,
-	reason,
+	userId,
+	reasonId,
 	details,
 	evictedOn
 ) {
@@ -71,12 +71,10 @@ export async function addEviction(
 		tenantName: tenantName,
 		tenantPhone: tenantPhone,
 		tenantEmail: tenantEmail,
-		user: user,
-		reason: reason,
+		user: userId,
+		reason: reasonId,
 		evictedOn: evictedOn,
-		details: [{
-			content: details
-		}]
+		details: details
 	});
 	return e._id.toString();
 }
@@ -114,9 +112,14 @@ export async function getEvictionById(id) {
 }
 
 export async function getConfirmEvictionById(id) {
-	let e = await ConfirmEviction.findById(id)
-		.populate('user', 'facilityName')
-		.populate('reason', 'desc')
+	let e = await ConfirmEviction.findById(id, { tenantName: 1, tenantEmail: 1, tenantPhone: 1, details: 1, evictedOn: 1, user: 1, reason: 1 })
+	return e;
+}
+
+export async function getConfirmEvictionByIdLean(id) {
+	let e = await ConfirmEviction.findById(id, { tenantName: 1, tenantEmail: 1, tenantPhone: 1, details: 1, evictedOn: 1, })
+		.populate({ path: 'user', select: 'facilityName -_id -username -facilityPhone' })
+		.populate({ path: 'reason', select: 'desc _id -label' })
 		.lean();
 	return e;
 }

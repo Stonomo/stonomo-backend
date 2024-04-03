@@ -6,7 +6,8 @@ import {
 	addConfirmEviction,
 	getConfirmEvictionById,
 	getEvictionById,
-	deleteEviction
+	deleteEviction,
+	getConfirmEvictionByIdLean
 } from '../models/Eviction.js';
 import { authenticateToken } from '../middleware/authenticateToken.js';
 import {
@@ -46,7 +47,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 router.get('/confirm/:id', authenticateToken, async (req, res) => {
 	try {
 		const evictionId = req.params.id
-		var eviction = await getConfirmEvictionById(evictionId);
+		var eviction = await getConfirmEvictionByIdLean(evictionId);
 		res.send(eviction);
 	} catch (err) {
 		res.status(404);
@@ -59,19 +60,23 @@ router.get('/confirm/:id', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, async (req, res) => {
 	try {
 		const userid = getUseridFromToken(getTokenFromRequest(req));
+		if (req.body.id === '') {
+			throw new Error('ID parameter required');
+		}
+		const submittedEviction = await getConfirmEvictionById(req.body.id);
 		const eviction = await addEviction(
-			req.body.tenantName,
-			req.body.tenantPhone,
-			req.body.tenantEmail,
+			submittedEviction.tenantName,
+			submittedEviction.tenantPhone,
+			submittedEviction.tenantEmail,
 			userid,
-			req.body.reason,
-			req.body.details, //TODO: convert to nested document with multiple entries and timestamps for each
-			req.body.evictedOn
+			submittedEviction.reason,
+			submittedEviction.details,
+			submittedEviction.evictedOn
 		);
 		res.send(eviction);
 	} catch (err) {
 		res.status(500);
-		res.send({ error: 'Internal Server Error' });
+		res.send({ error: 'Internal Server Error ' + err.message });
 	}
 })
 
