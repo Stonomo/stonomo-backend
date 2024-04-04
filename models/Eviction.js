@@ -216,21 +216,65 @@ export async function searchForEviction(searchName, searchPhone, searchEmail) {
 }
 
 export async function searchEvictionsByUser(searchName, searchPhone, searchEmail, searchUserId) {
-	const e = await Eviction.find({
-		$and: [{
-			user: new mongoose.Types.ObjectId(searchUserId)
+	const e = await Eviction.aggregate([
+		{
+			'$match': {
+				'$and': [
+					{
+						'user': new mongoose.Types.ObjectId(searchUserId)
+					}, {
+						'$or': [
+							{
+								'tenantName': searchName
+							}, {
+								'tenantPhone': searchPhone
+							}, {
+								'tenantEmail': searchEmail
+							}
+						]
+					}
+				]
+			}
 		}, {
-			$or: [
-				{ tenantName: searchName },
-				{ tenantPhone: searchPhone },
-				{ tenantEmail: searchEmail }
-			]
-		}]
-	}, { _id: 1, tenantName: 1, user: 1 })
-		.populate({ path: 'user', select: 'facilityName _id -username -facilityPhone' })
-		.populate({ path: 'reason', select: 'desc -_id -label' })
-		.lean();
-
+			'$project': {
+				'nameMatches': {
+					'$cond': {
+						'if': {
+							'$eq': [
+								'$tenantName', searchName
+							]
+						},
+						'then': 1,
+						'else': 0
+					}
+				},
+				'phoneMatches': {
+					'$cond': {
+						'if': {
+							'$eq': [
+								'$tenantPhone', searchPhone
+							]
+						},
+						'then': 1,
+						'else': 0
+					}
+				},
+				'emailMatches': {
+					'$cond': {
+						'if': {
+							'$eq': [
+								'$tenantEmail', searchEmail
+							]
+						},
+						'then': 1,
+						'else': 0
+					}
+				},
+				'evictedOn': 1,
+				'user': 1
+			}
+		}
+	])
 	return e;
 }
 
