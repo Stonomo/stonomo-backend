@@ -159,17 +159,59 @@ export function updateEviction(id, ...fields) {
 }
 
 export async function searchForEviction(searchName, searchPhone, searchEmail) {
-	const e = await Eviction.find({
-		$or: [
-			{ tenantName: searchName },
-			{ tenantPhone: searchPhone },
-			{ tenantEmail: searchEmail }
-		]
-	}, { _id: 1, tenantName: 1, user: 1 })
-		.populate({ path: 'user', select: 'facilityName _id -username -facilityPhone' })
-		.populate({ path: 'reason', select: 'desc -_id -label' })
-		.lean(); // lean bc we aren't updating anything
-
+	const e = await Eviction.aggregate([
+		{
+			'$match': {
+				'$or': [
+					{
+						'tenantName': searchName
+					}, {
+						'tenantPhone': searchPhone
+					}, {
+						'tenantEmail': searchEmail
+					}
+				]
+			}
+		}, {
+			'$project': {
+				'nameMatches': {
+					'$cond': {
+						'if': {
+							'$eq': [
+								'$tenantName', searchName
+							]
+						},
+						'then': 1,
+						'else': 0
+					}
+				},
+				'phoneMatches': {
+					'$cond': {
+						'if': {
+							'$eq': [
+								'$tenantPhone', searchPhone
+							]
+						},
+						'then': 1,
+						'else': 0
+					}
+				},
+				'emailMatches': {
+					'$cond': {
+						'if': {
+							'$eq': [
+								'$tenantEmail', searchEmail
+							]
+						},
+						'then': 1,
+						'else': 0
+					}
+				},
+				'evictedOn': 1,
+				'user': 1
+			}
+		}
+	])
 	return e;
 }
 
