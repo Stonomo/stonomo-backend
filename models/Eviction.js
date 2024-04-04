@@ -30,8 +30,7 @@ const evictionsSchema = new mongoose.Schema({
 		index: true
 	},
 	reason: {
-		type: mongoose.ObjectId,
-		ref: 'Reason',
+		type: String,
 		required: true,
 		index: true
 	},
@@ -63,7 +62,7 @@ export async function addEviction(
 	tenantPhone,
 	tenantEmail,
 	userId,
-	reasonId,
+	reason,
 	details,
 	evictedOn
 ) {
@@ -72,7 +71,7 @@ export async function addEviction(
 		tenantPhone: tenantPhone,
 		tenantEmail: tenantEmail,
 		user: userId,
-		reason: reasonId,
+		reason: reason,
 		evictedOn: evictedOn,
 		details: details
 	});
@@ -107,7 +106,6 @@ export async function addConfirmEviction(
 export async function getEvictionById(id) {
 	let e = await Eviction.findById(id)
 		.populate('user', 'facilityName')
-		.populate('reason', 'desc');
 	return e;
 }
 
@@ -119,7 +117,6 @@ export async function getConfirmEvictionById(id) {
 export async function getConfirmEvictionByIdLean(id) {
 	let e = await ConfirmEviction.findById(id, { tenantName: 1, tenantEmail: 1, tenantPhone: 1, details: 1, evictedOn: 1, })
 		.populate({ path: 'user', select: 'facilityName -_id -username -facilityPhone' })
-		.populate({ path: 'reason', select: 'desc _id -label' })
 		.lean();
 	return e;
 }
@@ -127,7 +124,6 @@ export async function getConfirmEvictionByIdLean(id) {
 export async function getEvictionByIdLean(id) {
 	let e = await Eviction.findById(id)
 		.populate('user', 'facilityName')
-		.populate('reason', 'desc')
 		.lean();
 	return e;
 }
@@ -140,7 +136,6 @@ export async function countEvictionsByUser(userId) {
 export async function getEvictionsByUser(userId) {
 	const e = await Eviction.find({ user: userId }, { _id: 1, tenantName: 1, user: 1 })
 		.populate({ path: 'user', select: 'facilityName _id -username -facilityPhone' })
-		.populate({ path: 'reason', select: 'desc -_id -label' })
 		.lean();
 	return e;
 }
@@ -299,7 +294,7 @@ export async function populateSampleEvictions() {
 					tenantPhone: evic.tenantPhone,
 					tenantEmail: evic.tenantEmail,
 					user: evic.user.$oid,
-					reason: evic.reason.$oid,
+					reason: evic.reason,
 					details: evic.details,
 					evictedOn: evic.evictedOn,
 					testData: true
