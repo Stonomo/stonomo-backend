@@ -51,7 +51,14 @@ const evictionsSchema = new mongoose.Schema({
 
 const confirmEvictionsSchema = evictionsSchema.clone()
 
-evictionsSchema.index({ tenantName: "text" });
+evictionsSchema.index({
+	tenantName: "text"
+}, {
+	collation: {
+		locale: 'en',
+		strength: 1
+	}
+});
 confirmEvictionsSchema.index({ "createdAt": 1 }, { expireAfterSeconds: 60 * 60 * 24 })
 
 export const Eviction = mongoose.model("Eviction", evictionsSchema);
@@ -115,7 +122,7 @@ export async function getConfirmEvictionById(id) {
 }
 
 export async function getConfirmEvictionByIdLean(id) {
-	let e = await ConfirmEviction.findById(id, { tenantName: 1, tenantEmail: 1, tenantPhone: 1, details: 1, evictedOn: 1, })
+	let e = await ConfirmEviction.findById(id, { tenantName: 1, tenantEmail: 1, tenantPhone: 1, details: 1, evictedOn: 1, reason: 1 })
 		.populate({ path: 'user', select: 'facilityName -_id -username -facilityPhone' })
 		.lean();
 	return e;
@@ -206,7 +213,7 @@ export async function searchForEviction(searchName, searchPhone, searchEmail) {
 				'user': 1
 			}
 		}
-	])
+	]).collation({ locale: 'en', strength: 1 })
 	return e;
 }
 
@@ -269,7 +276,7 @@ export async function searchEvictionsByUser(searchName, searchPhone, searchEmail
 				'user': 1
 			}
 		}
-	])
+	]).collation({ locale: 'en', strength: 1 })
 	return e;
 }
 
