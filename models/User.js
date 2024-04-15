@@ -92,6 +92,11 @@ export async function getUserByIdLean(id) {
 	return u;
 }
 
+export async function getUserByEmail(email) {
+	const u = await User.findOne({ facilityEmail: email })
+		.lean();
+	return u;
+}
 
 export async function updateUser(id, fields) {
 	let updateParams = {};

@@ -5,7 +5,7 @@ import { authenticateToken } from '../middleware/authenticateToken.js';
 import { getTokenFromRequest, getUseridFromToken, getUsernameFromToken } from '../lib/jwtHelper.js';
 
 var router = Router();
-const saltRounds = 10;
+const saltRounds = Number(process.env.BCRYPT_SALT);
 
 /* GET user's own user record. */
 router.get('/', authenticateToken, async (req, res) => {
@@ -65,10 +65,15 @@ router.get('/:userId', authenticateToken, async (req, res) => {
 /* PATCH - update user (user- and admin-only) */
 router.patch('/', authenticateToken, async (req, res) => {
 	try {
-		const setPassword = req.body.password && req.body.password != ""
-		const hash = await bcrypt.hash(req.body.password, saltRounds);
-		req.body.password = ''
+		const setPassword = req.body.password && req.body.password != '';
+		let hash;
 
+		let updateParams = { facilityAddress: {} };
+		if (setPassword) {
+			hash = await bcrypt.hash(req.body.password, saltRounds);
+			req.body.password = '';
+			updateParams.passHash = hash;
+		};
 		const username = getUsernameFromToken(getTokenFromRequest(req));
 		const user = await getUserByUsername(username);
 		if (!user) {
@@ -76,15 +81,18 @@ router.patch('/', authenticateToken, async (req, res) => {
 			return res.send({ error: 'User does not exist' });
 		}
 
-		let updateParams = {};
-		if (req.body.username) { updateParams.username = req.body.username }
-		if (setPassword) { updateParams.passHash = hash };
-		if (req.body.facilityName) { updateParams.facilityName = req.body.facilityName };
-		if (req.body.facilityAddress) { updateParams.facilityAddress = req.body.facilityAddress };
 		if (req.body.facilityPhone) { updateParams.facilityPhone = req.body.facilityPhone };
 		if (req.body.facilityEmail) { updateParams.facilityEmail = req.body.facilityEmail };
+		if (req.body.facilityAddrSt1) {
+			updateParams.facilityAddress.street1 = req.body.facilityAddrSt1;
+			updateParams.facilityAddress.street2 = req.body.facilityAddrSt2;
+			updateParams.facilityAddress.street3 = req.body.facilityAddrSt3;
+			updateParams.facilityAddress.city = req.body.facilityAddrCity;
+			updateParams.facilityAddress.state = req.body.facilityAddrState;
+			updateParams.facilityAddress.zip = req.body.facilityAddrZip
+		};
 
-		let updatedUser = await updateUser(user.id, updateParams);
+		let updatedUser = await updateUser(user._id, updateParams);
 		res.json({ message: "User updated successfully", updatedUser });
 
 	} catch (err) {
