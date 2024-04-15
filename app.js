@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
-import lessMiddleware from 'less-middleware';
 import logger from 'morgan';
 import mongoose from 'mongoose';
 import requestMethods from './middleware/requestMethods.js';
@@ -26,18 +25,15 @@ console.log("Configuring Express");
 
 // view engine setup
 
-app.set('views', join(__dirname, 'views'));
-
 app.use(logger('dev'));
 app.use(requestMethods);
 app.use(cors({
-	origin: ['http://localhost:8080', 'http://localhost'],
+	origin: ['http://localhost:8080', 'http://localhost', 'http://stonomo.com'],
 	credentials: true,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(getTokenSecret()));
-app.use(lessMiddleware(join(__dirname, 'public')));
 app.use(express.static(join(__dirname, 'public')));
 
 app.get("/status", (req, res) => {
@@ -78,7 +74,9 @@ console.log("Connecting to Database");
 let connectStatus;
 try {
 	const mongooseOptions = {
-		autoIndex: process.env.NODE_ENV === 'development', // only build indexes on development
+		autoIndex: false,//process.env.NODE_ENV === 'development', // only build indexes on development
+		tls: true,
+		tlsCAFile: './secrets/global-bundle.pem'
 	};
 	connectStatus = await mongoose.connect(process.env.MONGODB_URI, mongooseOptions);
 } catch (err) {
