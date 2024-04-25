@@ -1,8 +1,6 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
-
 const addressSchema = mongoose.Schema({
 	street1: {
 		type: String,
@@ -65,14 +63,25 @@ const userSchema = mongoose.Schema({
 			message: props => `${props.value} is not a valid email`
 		}
 	},
-	testData: { type: Boolean, required: true, default: false }
+	plan: {
+		type: String,
+		required: true,
+		select: true,
+		index: true,
+		default: 'FREE'
+	},
+	testData: {
+		type: Boolean,
+		required: true,
+		default: false
+	}
 });
 
 export const User = mongoose.model('User', userSchema);
 
-export function addUser(username, pass_hash, facilityName, facilityAddress, facilityPhone, facilityEmail) {
-	//TODO: parse facilityAddress as string into subdocument
-	let u = User.create(username, pass_hash, facilityName, facilityAddress, facilityPhone, facilityEmail)
+export function addUser(username, pass_hash, facilityName, street1, street2, street3, city, state, zip, facilityPhone, facilityEmail, facilityPlan) {
+	const facilityAddress = { street1, street2, street3, city, state, zip }
+	let u = User.create(username, pass_hash, facilityName, facilityAddress, facilityPhone, facilityEmail, facilityPlan)
 		.then(console.log);
 	return u;
 }
