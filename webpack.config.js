@@ -1,3 +1,1 @@
-module.exports = {
-	entry: './src/app.js'
-}
+export default entry = './src/app.js';
