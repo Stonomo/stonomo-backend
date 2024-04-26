@@ -1,1 +1,3 @@
-export const entry = './src/app.js';
+module.exports = {
+	entry: './src/app.js'
+}
