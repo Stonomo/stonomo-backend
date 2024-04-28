@@ -75,33 +75,38 @@ console.log("Connecting to Database");
 let connectStatus;
 try {
 	const mongooseOptions = {
+		auth: {
+			username: process.env.COSMOSDB_USER,
+			password: process.env.COSMOSDB_PASS
+		},
 		autoIndex: false,//process.env.NODE_ENV === 'development', // only build indexes on development
 		tls: true,
-		tlsCAFile: './secrets/global-bundle.pem'
+		retryWrites: false
 	};
-	connectStatus = await mongoose.connect(process.env.MONGODB_URI, mongooseOptions);
+	connectStatus = await mongoose.connect('mongodb://' + process.env.MONGODB_URI, mongooseOptions);
 } catch (err) {
 	console.log('Failed to connect to MongoDB');
 	console.log(err);
+	process.exit(1);
 };
-if (connectStatus) {
-	console.log("Connection Success!" + process.env.MONGODB_URI);
+
+console.log("Connection Success!" + process.env.MONGODB_URI);
 
 
-	console.log("Populating Reasons List");
+console.log("Populating Reasons List");
 
-	await populateReasons();
+await populateReasons();
 
-	console.log("Populating Sample Data");
+console.log("Populating Sample Data");
 
-	await populateSampleUsers();
-	await populateSampleEvictions();
+await populateSampleUsers();
+await populateSampleEvictions();
 
-	console.log("Opening Ports");
+console.log("Opening Ports");
 
-	app.listen(process.env.PORT, () => {
-		console.log("Server listening on port:", process.env.PORT);
-	});
-}
+app.listen(process.env.PORT, () => {
+	console.log("Server listening on port:", process.env.PORT);
+});
+
 
 export default app;
