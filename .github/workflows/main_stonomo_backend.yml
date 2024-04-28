@@ -10,7 +10,7 @@ on:
     branches: [ "master" ]
 
 env:
-  PORT: 7867
+  PORT: 8080
   MONGODB_URI: stonomo-backend-server.mongo.cosmos.azure.com:10255/stonomo
   COSMOSDB_USER: ${{ secrets.COSMOSDB_USER }}
   COSMOSDB_PASS: ${{ secrets.COSMOSDB_PASS }}
