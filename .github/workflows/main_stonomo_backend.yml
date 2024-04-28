@@ -11,11 +11,11 @@ on:
 
 env:
   PORT: 7867
-  MONGODB_URI: mongodb://stonomodb:27017/stonomo
-  TOKEN_SECRET_FILE: secrets/token_secret.txt
-  NODE_ENV: development
+  MONGODB_URI: stonomo-backend-server.mongo.cosmos.azure.com:10255/stonomo
+  TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+  NODE_ENV: production
   BCRYPT_SALT: 10
-  CLIENT_URL: localhost:8080
+  CLIENT_URL: www.stonomo.com/
   EMAIL_HOST: smtp.mailgun.org
   EMAIL_PORT: 587
   EMAIL_USERNAME: postmaster@sandbox8cad89a5ea9f4ec8a3f505b85704972a.mailgun.org
@@ -45,30 +45,12 @@ jobs:
         npm run build --if-present
         npm run test --if-present
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
       with:
-        name: node-app
-        path: dist
-      
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: node-app
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'Stonomo-backend'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }} # Publish profile should always be stored as secrets in your repository Settings - Secrets and variables - Actions - secrets
-          package: .
+        app-name: 'Stonomo-backend'
+        slot-name: 'Production'
+        # Publish profile should always be stored as secrets in your repository Settings - Secrets and variables - Actions - secrets
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }} 
+        package: .
