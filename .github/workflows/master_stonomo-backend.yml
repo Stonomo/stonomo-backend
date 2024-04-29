@@ -9,6 +9,21 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  PORT: 8080
+  MONGODB_URI: stonomo-backend-server.mongo.cosmos.azure.com:10255/stonomo
+  COSMOSDB_USER: ${{ secrets.COSMOSDB_USER }}
+  COSMOSDB_PASS: ${{ secrets.COSMOSDB_PASS }}
+  TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+  NODE_ENV: production
+  BCRYPT_SALT: 10
+  CLIENT_URL: www.stonomo.com/
+  EMAIL_HOST: smtp.mailgun.org
+  EMAIL_PORT: 587
+  EMAIL_USERNAME: postmaster@sandbox8cad89a5ea9f4ec8a3f505b85704972a.mailgun.org
+  EMAIL_PASSWORD: 824abb8a7117032b2f6bdad9d238fec2-4b670513-dcdb7e9e
+  FROM_EMAIL: stonomollc@gmail.com
+
 jobs:
   build:
     runs-on: ubuntu-latest
