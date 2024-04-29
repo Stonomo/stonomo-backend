@@ -33,7 +33,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser(getTokenSecret()));
+app.use(cookieParser(getTokenSecret())); //TODO: generate token secret if it doesn't exist
 app.use(express.static(join(__dirname, 'public')));
 
 app.get("/status", (req, res) => {
@@ -92,11 +92,11 @@ try {
 
 console.log("Connection Success!" + process.env.MONGODB_URI);
 
-
 console.log("Populating Reasons List");
 
 await populateReasons();
 
+// TODO: Move this to setup script
 console.log("Populating Sample Data");
 
 await populateSampleUsers();
@@ -104,7 +104,7 @@ await populateSampleEvictions();
 
 console.log("Opening Ports");
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 3000, () => {
 	console.log("Server listening on port:", process.env.PORT);
 });
 
