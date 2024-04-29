@@ -85,8 +85,8 @@ try {
 	};
 	connectStatus = await mongoose.connect('mongodb://' + process.env.MONGODB_URI, mongooseOptions);
 } catch (err) {
-	console.log('Failed to connect to MongoDB');
-	console.log(err);
+	console.error('Failed to connect to MongoDB');
+	console.error(err);
 	process.exit(1);
 };
 
