@@ -79,9 +79,10 @@ try {
 			username: process.env.COSMOSDB_USER,
 			password: process.env.COSMOSDB_PASS
 		},
-		autoIndex: false,//process.env.NODE_ENV === 'development', // only build indexes on development
+		autoIndex: process.env.NODE_ENV === 'development', // only auto-build indexes on development
 		tls: true,
-		retryWrites: false
+		retryWrites: false,
+		dbName: process.env.COSMOSDB_DBNAME
 	};
 	connectStatus = await mongoose.connect('mongodb://' + process.env.MONGODB_URI, mongooseOptions);
 } catch (err) {
