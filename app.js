@@ -49,7 +49,6 @@ app.use('/v1/search', routers.searchRouter);
 app.use('/v1/users', routers.userRouter);
 app.use('/v1/reasons', routers.reasonRouter);
 app.use('/v1/evictions', routers.evictionRouter);
-// app.use('/tc', routers.testClientRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -84,14 +83,15 @@ try {
 		retryWrites: false,
 		dbName: process.env.COSMOSDB_DBNAME
 	};
-	connectStatus = await mongoose.connect('mongodb://' + process.env.MONGODB_URI, mongooseOptions);
+	connectStatus = await mongoose.connect(`mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`, mongooseOptions);
 } catch (err) {
 	console.error('Failed to connect to MongoDB');
+	console.error(`URI: ${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`);
 	console.error(err);
 	process.exit(1);
 };
 
-console.log("Connection Success!" + process.env.MONGODB_URI);
+console.log("Connection Success! " + process.env.COSMOSDB_HOST);
 
 console.log("Populating Reasons List");
 
@@ -108,6 +108,5 @@ console.log("Opening Ports");
 app.listen(process.env.PORT || 3000, () => {
 	console.log("Server listening on port:", process.env.PORT);
 });
-
 
 export default app;
