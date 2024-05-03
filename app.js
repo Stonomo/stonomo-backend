@@ -94,10 +94,6 @@ try {
 
 console.log("Connection Success! " + process.env.COSMOSDB_HOST);
 
-console.log("Populating Reasons List");
-
-await populateReasons();
-
 console.log("Opening Ports");
 
 app.listen(process.env.PORT || 3000, () => {

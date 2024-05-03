@@ -26,6 +26,12 @@ router.get('/load-sample', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/populate-reasons', authenticateToken, async (req, res) => {
+  console.log("Populating Reasons List");
+  await populateReasons();
+  res.send('Reasons updated');
+});
+
 // router.get('/manage', function (req, res) {
 //   res.render('pages/manage');
 // });
