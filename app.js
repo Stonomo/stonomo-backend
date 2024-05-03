@@ -11,7 +11,7 @@ import requestMethods from './middleware/requestMethods.js';
 import routers from './routes/routers.js';
 import { populateReasons } from './models/Reason.js';
 import { populateSampleUsers } from './models/User.js';
-import { populateSampleEvictions } from './models/Eviction.js';
+import { populateSampleEvictions, populateTestUsers } from './lib/setup.js';
 import { getTokenSecret } from './lib/jwtHelper.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -93,6 +93,10 @@ try {
 };
 
 console.log("Connection Success! " + process.env.COSMOSDB_HOST);
+
+console.log('Creating test users');
+
+await populateTestUsers();
 
 console.log("Opening Ports");
 

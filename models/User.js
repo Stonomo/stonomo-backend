@@ -126,31 +126,3 @@ export function deleteUser(id) {
 		.then(console.log);
 	return u;
 }
-
-export async function populateSampleUsers() {
-	console.log("-Importing sample users")
-	const mockUserData = await import('../data/MOCKusers.json', { with: { type: "json" } });
-	console.log("-Transforming user data")
-	const userArray = []
-	const users = mockUserData['default']
-	for (const user of users) {
-		userArray.push({
-			replaceOne: {
-				upsert: true,
-				filter: { _id: user._id.$oid },
-				replacement: {
-					username: user.username,
-					passHash: user.passHash,
-					facilityName: user.facilityName,
-					facilityAddress: user.facilityAddress,
-					facilityPhone: user.facilityPhone,
-					facilityEmail: user.facilityEmail,
-					testData: true
-				}
-			}
-		});
-
-	}
-	console.log("-Writing user data to db")
-	await User.bulkWrite(userArray);
-}

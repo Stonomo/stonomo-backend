@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/authenticateToken.js';
-import { populateSampleUsers } from '../models/User.js';
-import { populateSampleEvictions } from '../models/Eviction.js';
+import { populateSampleEvictions, populateSampleUsers } from '../lib/setup.js';
 var router = Router();
 
 // /* GET home page. */
@@ -17,7 +16,7 @@ router.get('/load-sample', authenticateToken, async (req, res) => {
   try {
     console.log("Populating Sample Data");
     await populateSampleUsers();
-    await populateSampleEvictions();
+    await populateSampleEvictions(true);
     res.send('Sample loaded');
   } catch (err) {
     console.error('Failed to load sample');

@@ -1799,43 +1799,5 @@
 		"facilityEmail": "dspellicy2q@si.edu",
 		"plan": "FREE",
 		"testData": true
-	},
-	{
-		"_id": {
-			"$oid": "65499ed16a827c670570a386"
-		},
-		"username": "test-user",
-		"passHash": "$2b$10$sZ4UaHarrHOCyEeZsOmlYOnB948dxl42vlOpFS6Uh7HYIqfsM0WgS",
-		"facilityName": "Test Facility",
-		"facilityAddress": {
-			"street1": "123 Main St",
-			"city": "Anytown",
-			"state": "CO",
-			"zip": "80901"
-		},
-		"facilityPhone": "111-222-3333",
-		"facilityEmail": "test-user@stonomo.com",
-		"__v": 0,
-		"plan": "FREE",
-		"testData": true
-	},
-	{
-		"_id": {
-			"$oid": "65427f708c9c35222af1f624"
-		},
-		"username": "testuser-paid",
-		"passHash": "$2b$10$sZ4UaHarrHOCyEeZsOmlYOnB948dxl42vlOpFS6Uh7HYIqfsM0WgS",
-		"facilityName": "Test Facility",
-		"facilityAddress": {
-			"street1": "123 Main St",
-			"city": "Anytown",
-			"state": "CO",
-			"zip": "80901"
-		},
-		"facilityPhone": "111-222-3333",
-		"facilityEmail": "test-user@stonomo.com",
-		"__v": 0,
-		"plan": "PAID",
-		"testData": true
 	}
 ]
