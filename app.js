@@ -49,6 +49,7 @@ app.use('/v1/search', routers.searchRouter);
 app.use('/v1/users', routers.userRouter);
 app.use('/v1/reasons', routers.reasonRouter);
 app.use('/v1/evictions', routers.evictionRouter);
+app.use('/v1/admin', routers.adminRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -96,12 +97,6 @@ console.log("Connection Success! " + process.env.COSMOSDB_HOST);
 console.log("Populating Reasons List");
 
 await populateReasons();
-
-// TODO: Move this to setup script
-console.log("Populating Sample Data");
-
-await populateSampleUsers();
-await populateSampleEvictions();
 
 console.log("Opening Ports");
 
