@@ -1,3 +1,5 @@
+import { createServer } from 'https';
+import { readFileSync } from 'fs';
 import createError from 'http-errors';
 import express from 'express';
 import path, { join } from 'path';
@@ -9,13 +11,27 @@ import logger from 'morgan';
 import mongoose from 'mongoose';
 import requestMethods from './middleware/requestMethods.js';
 import routers from './routes/routers.js';
-import { populateReasons } from './models/Reason.js';
-import { populateSampleUsers } from './models/User.js';
-import { populateSampleEvictions, populateTestUsers } from './lib/setup.js';
+import { populateTestUsers } from './lib/setup.js';
 import { getTokenSecret } from './lib/jwtHelper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const mongooseOptions = {
+	auth: {
+		username: process.env.COSMOSDB_USER,
+		password: process.env.COSMOSDB_PASS
+	},
+	autoIndex: process.env.NODE_ENV === 'development', // only auto-build indexes on development
+	tls: true,
+	retryWrites: false,
+	dbName: process.env.COSMOSDB_DBNAME
+};
+
+const sslCreds = {
+	key: readFileSync('secrets/stonomoapi.com/privkey.pem', 'utf-8'),
+	cert: readFileSync('secrets/stonomoapi.com/fullchain.pem', 'utf-8')
+}
 
 console.log("Starting Express");
 
@@ -28,7 +44,7 @@ console.log("Configuring Express");
 app.use(logger('dev'));
 app.use(requestMethods);
 app.use(cors({
-	origin: ['http://localhost:8080', 'http://localhost', 'http://stonomo.com'],
+	origin: ['http://localhost:8080', 'http://localhost', 'https://stonomo.com'],
 	credentials: true,
 }));
 app.use(express.json());
@@ -74,16 +90,6 @@ console.log("Connecting to Database");
 
 let connectStatus;
 try {
-	const mongooseOptions = {
-		auth: {
-			username: process.env.COSMOSDB_USER,
-			password: process.env.COSMOSDB_PASS
-		},
-		autoIndex: process.env.NODE_ENV === 'development', // only auto-build indexes on development
-		tls: true,
-		retryWrites: false,
-		dbName: process.env.COSMOSDB_DBNAME
-	};
 	connectStatus = await mongoose.connect(`mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`, mongooseOptions);
 } catch (err) {
 	console.error('Failed to connect to MongoDB');
@@ -99,9 +105,10 @@ console.log('Creating test users');
 await populateTestUsers();
 
 console.log("Opening Ports");
+const server = createServer(sslCreds, app);
 
-app.listen(process.env.PORT || 3000, () => {
-	console.log("Server listening on port:", process.env.PORT);
+server.listen(process.env.PORT || 3000, () => {
+	console.log("Server listening on port: ", process.env.PORT);
 });
 
 export default app;
