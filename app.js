@@ -1,5 +1,5 @@
 import { createServer } from 'https';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync } from 'fs';
 import createError from 'http-errors';
 import express from 'express';
 import path, { join } from 'path';
@@ -27,6 +27,17 @@ const mongooseOptions = {
 	retryWrites: false,
 	dbName: process.env.COSMOSDB_DBNAME
 };
+
+console.log('/var/ssl/private');
+readdirSync('/var/ssl/private').forEach(file => {
+	console.log(file);
+});
+
+console.log('/var/ssl/certs');
+readdirSync('/var/ssl/certs').forEach(file => {
+	console.log(file);
+});
+
 
 let sslCreds;
 if (existsSync(`/var/ssl/private/${process.env.ssl_thumbprint}`)) {
@@ -94,7 +105,7 @@ app.use((err, req, res, next) => {
 	});
 });
 
-console.log("Connecting to Database");
+// console.log("Connecting to Database");
 
 try {
 	// await mongoose.connect(`mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`, mongooseOptions);
@@ -107,7 +118,7 @@ try {
 
 console.log("Connection Success! " + process.env.COSMOSDB_HOST);
 
-console.log('Creating test users');
+// console.log('Creating test users');
 
 // await populateTestUsers();
 
