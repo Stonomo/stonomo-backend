@@ -1,5 +1,5 @@
 import { createServer } from 'https';
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import createError from 'http-errors';
 import express from 'express';
 import path, { join } from 'path';
@@ -28,9 +28,17 @@ const mongooseOptions = {
 	dbName: process.env.COSMOSDB_DBNAME
 };
 
-const sslCreds = {
-	key: readFileSync('secrets/stonomoapi.com/privkey.pem', 'utf-8'),
-	cert: readFileSync('secrets/stonomoapi.com/fullchain.pem', 'utf-8')
+let sslCreds;
+if (existsSync(`/var/ssl/private/${process.env.ssl_thumbprint}`)) {
+	sslCreds = {
+		key: readFileSync(`/var/ssl/private/${process.env.ssl_thumbprint}`, 'utf-8'),
+		cert: readFileSync(`/var/ssl/certs/${process.env.ssl_thumbprint}`, 'utf-8')
+	}
+} else {
+	sslCreds = {
+		pfx: readFileSync('./secrets/Stonomoapi-current.pfx'),
+		passphrase: process.env.pfx_password
+	}
 }
 
 console.log("Starting Express");
@@ -88,9 +96,8 @@ app.use((err, req, res, next) => {
 
 console.log("Connecting to Database");
 
-let connectStatus;
 try {
-	connectStatus = await mongoose.connect(`mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`, mongooseOptions);
+	// await mongoose.connect(`mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`, mongooseOptions);
 } catch (err) {
 	console.error('Failed to connect to MongoDB');
 	console.error(`URI: ${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`);
@@ -102,13 +109,13 @@ console.log("Connection Success! " + process.env.COSMOSDB_HOST);
 
 console.log('Creating test users');
 
-await populateTestUsers();
+// await populateTestUsers();
 
 console.log("Opening Ports");
 const server = createServer(sslCreds, app);
 
 server.listen(process.env.PORT || 3000, () => {
-	console.log("Server listening on port: ", process.env.PORT);
+	console.log("Server listening on port:", process.env.PORT);
 });
 
 export default app;
