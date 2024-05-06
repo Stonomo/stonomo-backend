@@ -104,9 +104,9 @@ try {
 
 console.log("Connection Success! " + process.env.COSMOSDB_HOST);
 
-console.log('Creating test users');
+// console.log('Creating test users');
 
-await populateTestUsers();
+// await populateTestUsers();
 
 console.log("Opening Ports");
 const server = createServer(sslCreds, app);
