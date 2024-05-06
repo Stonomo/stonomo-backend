@@ -33,12 +33,10 @@ readdirSync('/var/ssl/private').forEach(file => {
 	console.log(file);
 });
 
-
-
 let sslCreds;
 if (existsSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`)) {
 	sslCreds = {
-		pfx: readFileSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`, 'utf-8'),
+		pfx: readFileSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`),
 		passphrase: process.env.pfx_password
 	}
 } else {
