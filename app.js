@@ -33,17 +33,17 @@ readdirSync('/var/ssl/private').forEach(file => {
 	console.log(file);
 });
 
-let sslCreds;
+let certFilePath;
 if (existsSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`)) {
-	sslCreds = {
-		pfx: readFileSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`),
-		passphrase: process.env.pfx_password
-	}
+	certFilePath = `/var/ssl/private/${process.env.ssl_thumbprint}.p12`;
+	console.log('Using Azure-provided certificate');
 } else {
-	sslCreds = {
-		pfx: readFileSync('./secrets/Stonomoapi-current.pfx'),
-		passphrase: process.env.pfx_password
-	}
+	certFilePath = './secrets/Stonomoapi-current.pfx';
+	console.log('Using local certificate');
+}
+const sslCreds = {
+	pfx: readFileSync(certFilePath),
+	passphrase: process.env.pfx_password
 }
 
 console.log("Starting Express");
@@ -51,8 +51,6 @@ console.log("Starting Express");
 var app = express();
 
 console.log("Configuring Express");
-
-// view engine setup
 
 app.use(logger('dev'));
 app.use(requestMethods);
@@ -62,7 +60,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser(getTokenSecret())); //TODO: generate token secret if it doesn't exist
+app.use(cookieParser(getTokenSecret()));
 app.use(express.static(join(__dirname, 'public')));
 
 app.get("/status", (req, res) => {
