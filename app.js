@@ -38,7 +38,7 @@ if (existsSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`)) {
 }
 const sslCreds = {
 	pfx: readFileSync(certFilePath),
-	passphrase: 'starlabs'// process.env.pfx_password
+	//passphrase: 'starlabs'// process.env.pfx_password
 }
 
 console.log("Starting Express");
