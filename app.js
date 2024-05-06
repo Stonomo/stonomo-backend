@@ -28,11 +28,6 @@ const mongooseOptions = {
 	dbName: process.env.COSMOSDB_DBNAME
 };
 
-console.log('/var/ssl/private');
-readdirSync('/var/ssl/private').forEach(file => {
-	console.log(file);
-});
-
 let certFilePath;
 if (existsSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`)) {
 	certFilePath = `/var/ssl/private/${process.env.ssl_thumbprint}.p12`;
