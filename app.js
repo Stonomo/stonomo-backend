@@ -38,7 +38,6 @@ if (existsSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`)) {
 }
 const sslCreds = {
 	pfx: readFileSync(certFilePath),
-	//passphrase: 'starlabs'// process.env.pfx_password
 }
 
 console.log("Starting Express");
@@ -92,10 +91,10 @@ app.use((err, req, res, next) => {
 	});
 });
 
-// console.log("Connecting to Database");
+console.log("Connecting to Database");
 
 try {
-	// await mongoose.connect(`mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`, mongooseOptions);
+	await mongoose.connect(`mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`, mongooseOptions);
 } catch (err) {
 	console.error('Failed to connect to MongoDB');
 	console.error(`URI: ${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`);
@@ -105,9 +104,9 @@ try {
 
 console.log("Connection Success! " + process.env.COSMOSDB_HOST);
 
-// console.log('Creating test users');
+console.log('Creating test users');
 
-// await populateTestUsers();
+await populateTestUsers();
 
 console.log("Opening Ports");
 const server = createServer(sslCreds, app);
