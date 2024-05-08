@@ -89,7 +89,6 @@ app.use((err, req, res, next) => {
 });
 
 console.log("Connecting to Database:", `mongodb://${mongoHost}:${mongoPort}`);
-console.log(mongooseOptions);
 
 try {
 	await mongoose.connect(`mongodb://${mongoHost}:${mongoPort}`, mongooseOptions);
