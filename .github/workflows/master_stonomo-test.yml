@@ -14,20 +14,20 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
 
     - name: Log in to registry
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: https://stonomo.azurecr.io/
         username: ${{ secrets.AzureAppService_ContainerUsername_3fb2f1b1020b4d389df3ddc0ce41a114 }}
         password: ${{ secrets.AzureAppService_ContainerPassword_7789f4348f14465f9eb38df0d1514f0d }}
 
     - name: Build and push container image to registry
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v5
       with:
         push: true
         tags: stonomo.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_3fb2f1b1020b4d389df3ddc0ce41a114 }}/stonomo/samples/stonomoapi:${{ github.sha }}
@@ -43,7 +43,7 @@ jobs:
     steps:
     - name: Deploy to Azure Web App
       id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
+      uses: azure/webapps-deploy@v3
       with:
         app-name: 'stonomo-test'
         slot-name: 'production'
