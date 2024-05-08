@@ -1,4 +1,4 @@
-import { createServer } from 'https';
+import { createServer } from 'http';
 import { existsSync, readFileSync, readdirSync } from 'fs';
 import createError from 'http-errors';
 import express from 'express';
@@ -23,21 +23,23 @@ const mongooseOptions = {
 		password: process.env.COSMOSDB_PASS
 	},
 	autoIndex: process.env.NODE_ENV === 'development', // only auto-build indexes on development
-	tls: true,
+	tls: process.env.NODE_ENV !== 'development', // no TLS on local dev
 	retryWrites: false,
 	dbName: process.env.COSMOSDB_DBNAME
 };
 
-let certFilePath;
+let sslCreds;
 if (existsSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`)) {
-	certFilePath = `/var/ssl/private/${process.env.ssl_thumbprint}.p12`;
-	console.log('Using Azure-provided certificate');
+	sslCreds = {
+		pfx: readFileSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`)
+	};
+	console.log('Using Azure-hosted certificate');
 } else {
-	certFilePath = './secrets/Stonomoapi-current.pfx';
+	sslCreds = {
+		pfx: readFileSync(process.env.SSL_PFX_FILE),
+		passphrase: process.env.pfx_password
+	};
 	console.log('Using local certificate');
-}
-const sslCreds = {
-	pfx: readFileSync(certFilePath),
 }
 
 console.log("Starting Express");
@@ -91,7 +93,8 @@ app.use((err, req, res, next) => {
 	});
 });
 
-console.log("Connecting to Database");
+console.log("Connecting to Database:", `mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`);
+console.log(mongooseOptions);
 
 try {
 	await mongoose.connect(`mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`, mongooseOptions);
