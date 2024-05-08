@@ -17,20 +17,29 @@ import { getTokenSecret } from './lib/jwtHelper.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const isDev = process.env.NODE_ENV === 'development';
+
+const mongoHost = process.env.COSMOSDB_HOST,
+	mongoPort = process.env.COSMOSDB_PORT,
+	mongoUser = process.env.COSMOSDB_USER,
+	mongoPass = process.env.COSMOSDB_PASS,
+	mongoDbName = process.env.COSMOSDB_DBNAME,
+	port = process.env.PORT;
+
 const mongooseOptions = {
 	auth: {
-		username: process.env.COSMOSDB_USER,
-		password: process.env.COSMOSDB_PASS
+		username: mongoUser,
+		password: mongoPass
 	},
-	autoIndex: process.env.NODE_ENV === 'development', // only auto-build indexes on development
-	tls: process.env.NODE_ENV !== 'development', // no TLS on local dev
+	autoIndex: isDev, // only auto-build indexes on development
+	tls: !isDev, // no TLS on local dev
 	retryWrites: false,
-	dbName: process.env.COSMOSDB_DBNAME
+	dbName: mongoDbName
 };
 
 console.log("Starting Express");
 
-var app = express();
+let app = express();
 
 console.log("Configuring Express");
 
@@ -69,7 +78,7 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
 	// set locals, only providing error in development
 	res.locals.message = err.message;
-	res.locals.error = process.env.NODE_ENV === 'development' ? err : {};
+	res.locals.error = isDev ? err : {};
 
 	// render the error page
 	res.status(err.status || 500);
@@ -79,19 +88,19 @@ app.use((err, req, res, next) => {
 	});
 });
 
-console.log("Connecting to Database:", `mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`);
+console.log("Connecting to Database:", `mongodb://${mongoHost}:${mongoPort}`);
 console.log(mongooseOptions);
 
 try {
-	await mongoose.connect(`mongodb://${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`, mongooseOptions);
+	await mongoose.connect(`mongodb://${mongoHost}:${mongoPort}`, mongooseOptions);
 } catch (err) {
 	console.error('Failed to connect to MongoDB');
-	console.error(`URI: ${process.env.COSMOSDB_HOST}:${process.env.COSMOSDB_PORT}`);
+	console.error(`URI: ${mongoHost}:${mongoPort}`);
 	console.error(err);
 	process.exit(1);
 };
 
-console.log("Connection Success! " + process.env.COSMOSDB_HOST);
+console.log("Connection Success! " + mongoHost);
 
 // console.log('Creating test users');
 
@@ -100,8 +109,8 @@ console.log("Connection Success! " + process.env.COSMOSDB_HOST);
 console.log("Opening Ports");
 const server = createServer(app);
 
-server.listen(process.env.PORT || 3000, () => {
-	console.log("Server listening on port:", process.env.PORT);
+server.listen(port || 3000, () => {
+	console.log("Server listening on port:", port);
 });
 
 export default app;
