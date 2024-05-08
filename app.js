@@ -28,20 +28,6 @@ const mongooseOptions = {
 	dbName: process.env.COSMOSDB_DBNAME
 };
 
-let sslCreds;
-if (existsSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`)) {
-	sslCreds = {
-		pfx: readFileSync(`/var/ssl/private/${process.env.ssl_thumbprint}.p12`)
-	};
-	console.log('Using Azure-hosted certificate');
-} else {
-	sslCreds = {
-		pfx: readFileSync(process.env.SSL_PFX_FILE),
-		passphrase: process.env.pfx_password
-	};
-	console.log('Using local certificate');
-}
-
 console.log("Starting Express");
 
 var app = express();
@@ -112,7 +98,7 @@ console.log("Connection Success! " + process.env.COSMOSDB_HOST);
 // await populateTestUsers();
 
 console.log("Opening Ports");
-const server = createServer(/*sslCreds,*/ app);
+const server = createServer(app);
 
 server.listen(process.env.PORT || 3000, () => {
 	console.log("Server listening on port:", process.env.PORT);
