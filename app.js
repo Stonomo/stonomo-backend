@@ -112,7 +112,7 @@ console.log("Connection Success! " + process.env.COSMOSDB_HOST);
 // await populateTestUsers();
 
 console.log("Opening Ports");
-const server = createServer(sslCreds, app);
+const server = createServer(/*sslCreds,*/ app);
 
 server.listen(process.env.PORT || 3000, () => {
 	console.log("Server listening on port:", process.env.PORT);
