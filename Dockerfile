@@ -9,4 +9,4 @@ COPY .env.docker .env
 RUN mkdir secrets
 RUN tr -dc A-Za-z0-9 </dev/urandom | head -c 13 > secrets/token_secret; echo
 CMD ["node", "app.js"]
-EXPOSE 7867
+EXPOSE 8080
