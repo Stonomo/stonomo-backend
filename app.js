@@ -101,9 +101,9 @@ try {
 
 console.log("Connection Success! " + mongoHost);
 
-// console.log('Creating test users');
+console.log('Creating test users');
 
-// await populateTestUsers();
+await conditionallyPopulateTestUsers();
 
 console.log("Opening Ports");
 const server = createServer(app);
