@@ -14,7 +14,6 @@ services:
         ipv4_address: 172.0.0.3
     secrets:
       - token_secret
-      - ssl_pfx
 
   stonomo-database:
     container_name: stonomo_db
@@ -36,5 +35,3 @@ networks:
 secrets:
   token_secret:
     file: secrets/token_secret.txt
-  ssl_pfx:
-    file: secrets/Stonomoapi-current.pfx
