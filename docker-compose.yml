@@ -1,4 +1,3 @@
-version: "3"
 services:
   stonomo-backend:
     container_name: stonomo_backend
