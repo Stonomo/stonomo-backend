@@ -1,5 +1,4 @@
 import { createServer } from 'http';
-import { existsSync, readFileSync, readdirSync } from 'fs';
 import createError from 'http-errors';
 import express from 'express';
 import path, { join } from 'path';
@@ -11,7 +10,7 @@ import logger from 'morgan';
 import mongoose from 'mongoose';
 import requestMethods from './middleware/requestMethods.js';
 import routers from './routes/routers.js';
-import { populateTestUsers } from './lib/setup.js';
+import { conditionallyPopulateTestUsers } from './lib/setup.js';
 import { getTokenSecret } from './lib/jwtHelper.js';
 
 const __filename = fileURLToPath(import.meta.url);
