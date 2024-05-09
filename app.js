@@ -101,12 +101,7 @@ try {
 		console.log('Creating test users');
 
 		conditionallyPopulateTestUsers().then(() => {
-			console.log("Opening Ports");
-			const server = createServer(app);
-
-			server.listen(port || 3000, () => {
-				console.log("Server listening on port:", port);
-			});
+			console.log('Test Users populated')
 		});
 	});
 } catch (err) {
@@ -116,6 +111,12 @@ try {
 	process.exit(1); //TODO: remove this in favor of setting health to bad
 };
 
+console.log("Opening Ports");
+const server = createServer(app);
+
+server.listen(port || 3000, () => {
+	console.log("Server listening on port:", port);
+});
 // while (mongoose.connection.readyState !== 1) {
 // 	//TODO: set health to bad db connection-itis
 // }
