@@ -45,7 +45,7 @@ console.log("Configuring Express");
 app.use(logger('dev'));
 app.use(requestMethods);
 app.use(cors({
-	origin: ['http://localhost:8080', 'http://localhost', 'https://stonomo.com'],
+	origin: ['http://localhost:3000', 'http://localhost', 'https://stonomo.com'],
 	credentials: true,
 }));
 app.use(express.json());
@@ -54,7 +54,7 @@ app.use(cookieParser(getTokenSecret()));
 app.use(express.static(join(__dirname, 'public')));
 
 app.get("/status", (req, res) => {
-
+	//TODO: add health check logic
 	res.send({ status: 'Running' });
 });
 
@@ -90,25 +90,30 @@ app.use((err, req, res, next) => {
 console.log("Connecting to Database:", `mongodb://${mongoHost}:${mongoPort}`);
 
 try {
-	await mongoose.connect(`mongodb://${mongoHost}:${mongoPort}`, mongooseOptions);
+	mongoose.connect(`mongodb://${mongoHost}:${mongoPort}`, mongooseOptions).then(() => {
+		// TODO: set health to good
+		console.log("Connection Success! " + mongoHost);
+
+		console.log('Creating test users');
+
+		conditionallyPopulateTestUsers().then(() => {
+			console.log("Opening Ports");
+			const server = createServer(app);
+
+			server.listen(port || 3000, () => {
+				console.log("Server listening on port:", port);
+			});
+		});
+	});
 } catch (err) {
 	console.error('Failed to connect to MongoDB');
 	console.error(`URI: ${mongoHost}:${mongoPort}`);
 	console.error(err);
-	process.exit(1);
+	process.exit(1); //TODO: remove this in favor of setting health to bad
 };
 
-console.log("Connection Success! " + mongoHost);
-
-console.log('Creating test users');
-
-await conditionallyPopulateTestUsers();
-
-console.log("Opening Ports");
-const server = createServer(app);
-
-server.listen(port || 3000, () => {
-	console.log("Server listening on port:", port);
-});
+// while (mongoose.connection.readyState !== 1) {
+// 	//TODO: set health to bad db connection-itis
+// }
 
 export default app;
