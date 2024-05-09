@@ -24,9 +24,10 @@ router.post('/login', async (req, res) => {
 
 			res.cookie('stonomoToken', authToken, {
 				secure: process.env.NODE_ENV !== "development",
+				path: '/',
 				httpOnly: true,
 				signed: true,
-				sameSite: 'lax',
+				sameSite: 'none',
 				maxAge: 1000 * 60 * 60 // One hour TTL
 			});
 
