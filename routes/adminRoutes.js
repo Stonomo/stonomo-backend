@@ -1,6 +1,10 @@
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/authenticateToken.js';
-import { populateSampleEvictions, populateSampleUsers } from '../lib/setup.js';
+import {
+  populateSampleEvictions,
+  populateSampleUsers
+} from '../lib/setup.js';
+import { populateReasons } from '../models/Reason.js';
 var router = Router();
 
 // /* GET home page. */
