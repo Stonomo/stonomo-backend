@@ -5,7 +5,7 @@ services:
     build:
       dockerfile: ./Dockerfile
     ports:
-      - "7867:7867"
+      - "8080:8080"
     links:
       - stonomo-database
     networks:
