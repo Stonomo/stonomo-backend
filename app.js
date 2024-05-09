@@ -10,31 +10,12 @@ import logger from 'morgan';
 import mongoose from 'mongoose';
 import requestMethods from './middleware/requestMethods.js';
 import routers from './routes/routers.js';
-import { conditionallyPopulateTestUsers } from './lib/setup.js';
 import { getTokenSecret } from './lib/jwtHelper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const isDev = process.env.NODE_ENV === 'development';
-
-const mongoHost = process.env.COSMOSDB_HOST,
-	mongoPort = process.env.COSMOSDB_PORT,
-	mongoUser = process.env.COSMOSDB_USER,
-	mongoPass = process.env.COSMOSDB_PASS,
-	mongoDbName = process.env.COSMOSDB_DBNAME,
-	port = process.env.PORT;
-
-const mongooseOptions = {
-	auth: {
-		username: mongoUser,
-		password: mongoPass
-	},
-	autoIndex: isDev, // only auto-build indexes on development
-	tls: !isDev, // no TLS on local dev
-	retryWrites: false,
-	dbName: mongoDbName
-};
 
 console.log("Starting Express");
 
@@ -91,25 +72,7 @@ app.use((err, req, res, next) => {
 	});
 });
 
-console.log("Connecting to Database:", `mongodb://${mongoHost}:${mongoPort}`);
-
-try {
-	mongoose.connect(`mongodb://${mongoHost}:${mongoPort}`, mongooseOptions).then(() => {
-		// TODO: set health to good
-		console.log("Connection Success! " + mongoHost);
-
-		console.log('Creating test users');
-
-		conditionallyPopulateTestUsers().then(() => {
-			console.log('Test Users populated')
-		});
-	});
-} catch (err) {
-	console.error('Failed to connect to MongoDB');
-	console.error(`URI: ${mongoHost}:${mongoPort}`);
-	console.error(err);
-	process.exit(1); //TODO: remove this in favor of setting health to bad
-};
+connectToDatabase();
 
 console.log("Opening Ports");
 const server = createServer(app);
