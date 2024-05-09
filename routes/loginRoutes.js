@@ -23,7 +23,7 @@ router.post('/login', async (req, res) => {
 			const refreshToken = await generateRefreshToken(user);
 
 			res.cookie('stonomoToken', authToken, {
-				secure: process.env.NODE_ENV !== "development",
+				secure: true,
 				path: '/',
 				httpOnly: true,
 				signed: true,
