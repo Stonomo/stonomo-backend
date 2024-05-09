@@ -55,7 +55,11 @@ app.use(express.static(join(__dirname, 'public')));
 
 app.get("/status", (req, res) => {
 	//TODO: add health check logic
-	res.send({ status: 'Running' });
+	const status = {
+		message: 'Running',
+		dbConnection: mongoose.connection.readyState
+	}
+	res.send(status);
 });
 
 console.log("Adding Routes");
