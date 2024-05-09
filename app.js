@@ -11,11 +11,13 @@ import mongoose from 'mongoose';
 import requestMethods from './middleware/requestMethods.js';
 import routers from './routes/routers.js';
 import { getTokenSecret } from './lib/jwtHelper.js';
+import { connectToDatabase } from './lib/setup.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const isDev = process.env.NODE_ENV === 'development';
+const port = process.env.PORT;
 
 console.log("Starting Express");
 
