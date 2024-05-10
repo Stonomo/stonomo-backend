@@ -66,8 +66,9 @@ router.post('/', authenticateToken, async (req, res) => {
 		const submittedEviction = await getConfirmEvictionById(req.body.id);
 		const eviction = await addEviction(
 			submittedEviction.tenantName,
+			submittedEviction.tenantName.toLowerCase(),
 			submittedEviction.tenantPhone,
-			submittedEviction.tenantEmail,
+			submittedEviction.tenantEmail.toLowerCase(),
 			userid,
 			submittedEviction.reason,
 			submittedEviction.details,

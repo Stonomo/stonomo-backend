@@ -14,6 +14,10 @@ const evictionsSchema = new mongoose.Schema({
 		required: true,
 		index: true
 	},
+	tenantNameLower: {
+		type: String,
+		index: true
+	},
 	tenantPhone: {
 		type: String,
 		index: true
@@ -30,17 +34,14 @@ const evictionsSchema = new mongoose.Schema({
 	},
 	reason: {
 		type: String,
-		required: true,
-		index: true
+		required: true
 	},
 	details: {
-		type: [evictionDetailsSchema],
-		index: true
+		type: [evictionDetailsSchema]
 	},
 	evictedOn: {
 		type: Date,
-		required: true,
-		index: true
+		required: true
 	},
 	testData: {
 		type: Boolean,
@@ -74,6 +75,7 @@ export async function addEviction(
 ) {
 	let e = await Eviction.create({
 		tenantName: tenantName,
+		tenantNameLower: tenantName.toLowerCase(),
 		tenantPhone: tenantPhone,
 		tenantEmail: tenantEmail,
 		user: userId,
@@ -96,7 +98,7 @@ export async function addConfirmEviction(
 	let e = await ConfirmEviction.create({
 		tenantName: tenantName,
 		tenantPhone: tenantPhone,
-		tenantEmail: tenantEmail,
+		tenantEmail: tenantEmail.toLowerCase(),
 		user: user,
 		reason: reason,
 		evictedOn: evictedOn,
@@ -160,16 +162,18 @@ export function updateEviction(id, ...fields) {
 }
 
 export async function searchForEviction(searchName, searchPhone, searchEmail) {
+	const searchNameLower = searchName.toLowerCase();
+	const searchEmailLower = searchEmail.toLowerCase();
 	const e = await Eviction.aggregate([
 		{
 			'$match': {
 				'$or': [
 					{
-						'tenantName': searchName
+						'tenantNameLower': searchNameLower
 					}, {
 						'tenantPhone': searchPhone
 					}, {
-						'tenantEmail': searchEmail
+						'tenantEmail': searchEmailLower
 					}
 				]
 			}
@@ -179,7 +183,7 @@ export async function searchForEviction(searchName, searchPhone, searchEmail) {
 					'$cond': {
 						'if': {
 							'$eq': [
-								'$tenantName', searchName
+								'$tenantName', searchNameLower
 							]
 						},
 						'then': 1,
@@ -201,7 +205,7 @@ export async function searchForEviction(searchName, searchPhone, searchEmail) {
 					'$cond': {
 						'if': {
 							'$eq': [
-								'$tenantEmail', searchEmail
+								'$tenantEmail', searchEmailLower
 							]
 						},
 						'then': 1,
@@ -217,6 +221,8 @@ export async function searchForEviction(searchName, searchPhone, searchEmail) {
 }
 
 export async function searchEvictionsByUser(searchName, searchPhone, searchEmail, searchUserId) {
+	const searchNameLower = searchName.toLowerCase();
+	const searchEmailLower = searchEmail.toLowerCase();
 	const e = await Eviction.aggregate([
 		{
 			'$match': {
@@ -226,11 +232,11 @@ export async function searchEvictionsByUser(searchName, searchPhone, searchEmail
 					}, {
 						'$or': [
 							{
-								'tenantName': searchName
+								'tenantNameLower': searchNameLower
 							}, {
 								'tenantPhone': searchPhone
 							}, {
-								'tenantEmail': searchEmail
+								'tenantEmail': searchEmailLower
 							}
 						]
 					}
@@ -242,7 +248,7 @@ export async function searchEvictionsByUser(searchName, searchPhone, searchEmail
 					'$cond': {
 						'if': {
 							'$eq': [
-								'$tenantName', searchName
+								'$tenantNameLower', searchNameLower
 							]
 						},
 						'then': 1,
@@ -264,7 +270,7 @@ export async function searchEvictionsByUser(searchName, searchPhone, searchEmail
 					'$cond': {
 						'if': {
 							'$eq': [
-								'$tenantEmail', searchEmail
+								'$tenantEmail', searchEmailLower
 							]
 						},
 						'then': 1,
