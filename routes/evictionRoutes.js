@@ -76,6 +76,7 @@ router.post('/', authenticateToken, async (req, res) => {
 		);
 		res.send(eviction);
 	} catch (err) {
+		console.error(err.message);
 		res.status(500);
 		res.send({ error: 'Internal Server Error ' + err.message });
 	}
