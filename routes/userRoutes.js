@@ -81,9 +81,10 @@ router.patch('/', authenticateToken, async (req, res) => {
 			return res.send({ error: 'User does not exist' });
 		}
 
+		if (req.body.facilityName) { updateParams.facilityName = req.body.facilityName };
 		if (req.body.facilityPhone) { updateParams.facilityPhone = req.body.facilityPhone };
 		if (req.body.facilityEmail) { updateParams.facilityEmail = req.body.facilityEmail };
-		if (req.body.facilityAddrSt1) {
+		if (req.body.facilityAddrChange) {
 			updateParams.facilityAddress.street1 = req.body.facilityAddrSt1;
 			updateParams.facilityAddress.street2 = req.body.facilityAddrSt2;
 			updateParams.facilityAddress.street3 = req.body.facilityAddrSt3;

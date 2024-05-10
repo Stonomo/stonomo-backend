@@ -10,10 +10,6 @@ const addressSchema = mongoose.Schema({
 		type: String,
 		required: false,
 	},
-	street3: {
-		type: String,
-		required: false,
-	},
 	city: {
 		type: String,
 		required: true,
