@@ -24,6 +24,7 @@ router.get('/by-user', authenticateToken, async (req, res) => {
 		const evictions = await getEvictionsByUser(userId);
 		res.send(evictions);
 	} catch (err) {
+		console.error(err.message)
 		res.status(500);
 		res.send({ error: 'Eviction record does not exist' });
 	}
@@ -37,6 +38,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 		var eviction = await getEvictionByIdLean(evictionId);
 		res.send(eviction);
 	} catch (err) {
+		console.error(err.message)
 		res.status(404);
 		res.send({ error: 'Eviction record does not exist' });
 	}
@@ -50,6 +52,7 @@ router.get('/confirm/:id', authenticateToken, async (req, res) => {
 		var eviction = await getConfirmEvictionByIdLean(evictionId);
 		res.send(eviction);
 	} catch (err) {
+		console.error(err.message)
 		res.status(404);
 		res.send({ error: 'Eviction record does not exist' });
 	}
@@ -66,9 +69,8 @@ router.post('/', authenticateToken, async (req, res) => {
 		const submittedEviction = await getConfirmEvictionById(req.body.id);
 		const eviction = await addEviction(
 			submittedEviction.tenantName,
-			submittedEviction.tenantName.toLowerCase(),
 			submittedEviction.tenantPhone,
-			submittedEviction.tenantEmail.toLowerCase(),
+			submittedEviction.tenantEmail,
 			userid,
 			submittedEviction.reason,
 			submittedEviction.details,
@@ -76,7 +78,7 @@ router.post('/', authenticateToken, async (req, res) => {
 		);
 		res.send(eviction);
 	} catch (err) {
-		console.error(err.message);
+		console.error(err.message)
 		res.status(500);
 		res.send({ error: 'Internal Server Error ' + err.message });
 	}
@@ -122,6 +124,7 @@ router.patch('/:id', authenticateToken, async (req, res) => {
 			res.send(eviction._id);
 		}
 	} catch (err) {
+		console.error(err.message)
 		res.status(404);
 		res.send({ error: 'Record not found. ' + err });
 	}
@@ -142,6 +145,7 @@ router.delete('/:id', authenticateToken, async (req, res, next) => {
 			throw new Error('Only the reporting facility can delete this eviction')
 		}
 	} catch (err) {
+		console.error(err.message)
 		res.status(403);
 		res.send({ error: 'Forbidden. ' + err.message });
 	}
