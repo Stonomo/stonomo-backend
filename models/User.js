@@ -112,8 +112,9 @@ export async function updateUser(id, fields) {
 	let updateParams = {};
 	//filter out any blank values to avoid accidental data deletion
 	for (const [k, v] of Object.entries(fields)) {
-		// TODO: add handling for invalid params
-		if (k !== '' && v != {}) {
+		// TODO: add handling for invalid/secure fields
+		if ((k !== '' && v != {})
+			&& k !== 'admin') {
 			updateParams[k] = v;
 		}
 	}
