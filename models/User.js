@@ -66,6 +66,11 @@ const userSchema = mongoose.Schema({
 		index: true,
 		default: 'FREE'
 	},
+	admin: {
+		type: Boolean,
+		required: true,
+		default: false
+	},
 	testData: {
 		type: Boolean,
 		required: true,

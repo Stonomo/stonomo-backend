@@ -11,7 +11,7 @@ import mongoose from 'mongoose';
 import requestMethods from './middleware/requestMethods.js';
 import routers from './routes/routers.js';
 import { getTokenSecret } from './lib/jwtHelper.js';
-import { connectToDatabase } from './lib/setup.js';
+import { conditionallyPopulateTestUsers, connectToDatabase } from './lib/setup.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,7 +25,7 @@ let app = express();
 
 console.log("Configuring Express");
 
-app.use(logger('dev'));
+app.use(logger('tiny'));
 app.use(requestMethods);
 app.use(cors({
 	origin: ['http://localhost:3000', 'http://localhost', 'https://stonomo.com'],
@@ -37,17 +37,18 @@ app.use(cookieParser(getTokenSecret()));
 app.use(express.static(join(__dirname, 'public')));
 
 app.get("/status", (req, res) => {
-	//TODO: add health check logic
 	const status = {
 		message: 'Running',
-		dbConnection: mongoose.connection.readyState
+		dbConnection: mongoose.connection.readyState,
+		responseTime: process.hrtime(),
+		uptime: process.uptime()
 	}
 	res.send(status);
 });
 
 console.log("Adding Routes");
 
-app.use('/v1', routers.loginRouter);
+app.use('/v1', routers.rootRouter);
 app.use('/v1/password', routers.passwordRouter);
 app.use('/v1/search', routers.searchRouter);
 app.use('/v1/users', routers.userRouter);
@@ -74,7 +75,13 @@ app.use((err, req, res, next) => {
 	});
 });
 
-connectToDatabase();
+connectToDatabase().then(() => {
+	console.log('Checking test users');
+
+	conditionallyPopulateTestUsers().then(() => {
+		console.log('Test user check complete');
+	});
+});
 
 console.log("Opening Ports");
 const server = createServer(app);
@@ -82,6 +89,7 @@ const server = createServer(app);
 server.listen(port || 3000, () => {
 	console.log("Server listening on port:", port);
 });
+
 // while (mongoose.connection.readyState !== 1) {
 // 	//TODO: set health to bad db connection-itis
 // }
