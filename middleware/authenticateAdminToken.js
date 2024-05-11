@@ -9,15 +9,17 @@ export async function authenticateAdminToken(req, res, next) {
 	jwt.verify(
 		token,
 		getTokenSecret(),
-		(err, user) => {
+		(err, token) => {
 			if (err) {
 				console.log(err)
 				return res.sendStatus(403);
 			}
 
-			req.user = user;
+			if (token.admin !== true) {
+				return res.sendStatus(403);
+			}
 
-			//TODO: add admin check
+			req.token = token;
 			next();
 		}
 	)
