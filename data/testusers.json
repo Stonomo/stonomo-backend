@@ -3,18 +3,18 @@
 		"_id": {
 			"$oid": "65499ed16a827c670570a386"
 		},
-		"username": "test-user",
+		"username": "testuser-free",
 		"passHash": "$2b$10$sZ4UaHarrHOCyEeZsOmlYOnB948dxl42vlOpFS6Uh7HYIqfsM0WgS",
 		"facilityName": "Test Facility",
 		"facilityAddress": {
 			"street1": "123 Main St",
+			"street2": "Suite 100",
 			"city": "Anytown",
 			"state": "CO",
 			"zip": "80901"
 		},
 		"facilityPhone": "111-222-3333",
 		"facilityEmail": "test-user@stonomo.com",
-		"__v": 0,
 		"plan": "FREE",
 		"testData": true
 	},
@@ -27,14 +27,34 @@
 		"facilityName": "Test Facility",
 		"facilityAddress": {
 			"street1": "123 Main St",
+			"street2": "Suite 110",
 			"city": "Anytown",
 			"state": "CO",
 			"zip": "80901"
 		},
 		"facilityPhone": "111-222-3333",
 		"facilityEmail": "test-user@stonomo.com",
-		"__v": 0,
 		"plan": "PAID",
+		"testData": true
+	},
+	{
+		"_id": {
+			"$oid": "65499ed16a827c670570a387"
+		},
+		"username": "testuser-admin",
+		"passHash": "$2b$10$sZ4UaHarrHOCyEeZsOmlYOnB948dxl42vlOpFS6Uh7HYIqfsM0WgS",
+		"facilityName": "Test Facility - Admin",
+		"facilityAddress": {
+			"street1": "123 Main St",
+			"street2": "Suite 120",
+			"city": "Anytown",
+			"state": "CO",
+			"zip": "80901"
+		},
+		"facilityPhone": "111-222-3333",
+		"facilityEmail": "stonomollc@gmail.com",
+		"plan": "PAID",
+		"admin": true,
 		"testData": true
 	}
 ]
