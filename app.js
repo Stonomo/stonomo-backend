@@ -25,7 +25,7 @@ let app = express();
 
 console.log("Configuring Express");
 
-app.use(logger('dev'));
+app.use(logger('tiny'));
 app.use(requestMethods);
 app.use(cors({
 	origin: ['http://localhost:3000', 'http://localhost', 'https://stonomo.com'],
@@ -37,7 +37,6 @@ app.use(cookieParser(getTokenSecret()));
 app.use(express.static(join(__dirname, 'public')));
 
 app.get("/status", (req, res) => {
-	//TODO: add health check logic
 	const status = {
 		message: 'Running',
 		dbConnection: mongoose.connection.readyState,
@@ -90,6 +89,7 @@ const server = createServer(app);
 server.listen(port || 3000, () => {
 	console.log("Server listening on port:", port);
 });
+
 // while (mongoose.connection.readyState !== 1) {
 // 	//TODO: set health to bad db connection-itis
 // }
