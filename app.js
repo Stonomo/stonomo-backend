@@ -28,9 +28,10 @@ console.log("Configuring Express");
 app.use(logger('tiny'));
 app.use(requestMethods);
 app.use(cors({
-	origin: ['http://localhost:3000', 'http://localhost', 'https://stonomo.com'],
+	origin: [/^http:\/\/localhost(:\d{1,4})?/, 'https://stonomo.com'],
 	credentials: true,
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(getTokenSecret()));
@@ -94,4 +95,4 @@ server.listen(port || 3000, () => {
 // 	//TODO: set health to bad db connection-itis
 // }
 
-export default app;
+export default server;
