@@ -37,12 +37,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(getTokenSecret()));
 app.use(express.static(join(__dirname, 'public')));
 
-app.get("/status", (req, res) => {
+app.get("/status", (_req, res) => {
 	const status = {
 		message: 'Running',
 		dbConnection: mongoose.connection.readyState,
 		responseTime: process.hrtime(),
-		uptime: process.uptime()
+		uptime: process.uptime(),
+		timestamp: Date.now(),
 	}
 	res.send(status);
 });
@@ -58,12 +59,12 @@ app.use('/v1/evictions', routers.evictionRouter);
 app.use('/v1/admin', routers.adminRouter);
 
 // catch 404 and forward to error handler
-app.use((req, res, next) => {
+app.use((_req, _res, next) => {
 	next(createError(404));
 });
 
 // error handler
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
 	// set locals, only providing error in development
 	res.locals.message = err.message;
 	res.locals.error = isDev ? err : {};

@@ -163,7 +163,7 @@ export function updateEviction(id, ...fields) {
 
 export async function searchForEviction(searchName, searchPhone, searchEmail) {
 	const searchNameLower = searchName.toLowerCase();
-	const searchEmailLower = searchEmail.toLowerCase();
+	const searchEmailLower = searchEmail?.toLowerCase();
 	const e = await Eviction.aggregate([
 		{
 			'$match': {
