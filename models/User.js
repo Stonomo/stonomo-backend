@@ -66,6 +66,11 @@ const userSchema = mongoose.Schema({
 		index: true,
 		default: 'FREE'
 	},
+	freeSearches: {
+		type: Number,
+		required: true,
+		default: 0
+	},
 	admin: {
 		type: Boolean,
 		required: true,
@@ -120,6 +125,31 @@ export async function updateUser(id, fields) {
 	}
 	await User.findByIdAndUpdate(id, { $set: updateParams });
 	return getUserByIdLean(id);
+}
+
+export async function userHasFreeSearches(id) {
+	const user = await getUserById(id);
+	if (user.plan === 'PAID' || user.freeSearches > 0) {
+		return true;
+	}
+	return false;
+}
+
+export async function getUserFreeSearches(id) {
+	const u = await getUserById(id);
+	return Math.max(0, u.freeSearches);
+}
+
+export async function addUserFreeSearches(id) {
+	const searches = await getUserFreeSearches(id);
+	const newSearches = searches + 3;
+	return await updateUser(id, { freeSearches: newSearches });
+}
+
+export async function decrementUserFreeSearches(id) {
+	const searches = await getUserFreeSearches(id);
+	const newSearches = Math.max(0, searches - 1);
+	return await updateUser(id, { freeSearches: newSearches });
 }
 
 export function deleteUser(id) {
