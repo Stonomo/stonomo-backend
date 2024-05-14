@@ -14,6 +14,7 @@ import {
 	getTokenFromRequest,
 	getUseridFromToken
 } from '../lib/jwtHelper.js';
+import { addUserFreeSearches } from '../models/User.js';
 
 let router = Router();
 
@@ -76,6 +77,7 @@ router.post('/', authenticateToken, async (req, res) => {
 			submittedEviction.details,
 			submittedEviction.evictedOn
 		);
+		await addUserFreeSearches(userid);
 		res.send(eviction);
 	} catch (err) {
 		console.error(err.message)
