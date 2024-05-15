@@ -34,6 +34,6 @@ networks:
 
 secrets:
   token_secret:
-    file: secrets/token_secret.txt
+    file: secrets/token_secret
   refresh_token_secret:
-    file: secrets/refresh_token_secret.txt
+    file: secrets/refresh_token_secret
