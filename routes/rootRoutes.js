@@ -2,7 +2,7 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt';
 
-import { getUserByUsername } from '../models/User.js';
+import { getUserByIdLean, getUserByUsername } from '../models/User.js';
 import {
 	generateAccessToken,
 	generateRefreshToken,
@@ -55,7 +55,7 @@ router.post('/refresh-token', async (req, res) => {
 			return res.status(403).json({ message: 'Invalid refresh token' });
 		}
 
-		const { name, tokenType, tokenFamily, nonce } = decoded;
+		const { id, tokenType, tokenFamily, nonce } = decoded;
 
 		if (tokenType !== 'refresh') {
 			return res.status(403).json({ message: 'Invalid token type' });
@@ -86,7 +86,7 @@ router.post('/refresh-token', async (req, res) => {
 			newTokenFamily = generateNonce();
 		}
 
-		const user = await getUserByUsername(name);
+		const user = await getUserByIdLean(id);
 
 		// Generate new access and refresh tokens with a new nonce
 		const newNonce = generateNonce();
