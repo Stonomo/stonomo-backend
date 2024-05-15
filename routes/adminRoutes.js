@@ -9,18 +9,18 @@ import {
 import { populateReasons } from '../models/Reason.js';
 var router = Router();
 
-router.get('/test-admin', authenticateAdminToken, async (_req, res) => {
+router.post('/test-admin', authenticateAdminToken, async (_req, res) => {
 	console.log('Admin route hit');
 	res.send('Admin route success');
 })
 
-router.get('/populate-reasons', authenticateAdminToken, async (_req, res) => {
+router.post('/populate-reasons', authenticateAdminToken, async (_req, res) => {
 	console.log("Populating Reasons List");
 	await populateReasons();
 	res.send('Reasons updated');
 });
 
-router.get('/load-test-evictions', authenticateAdminToken, async (_req, res) => {
+router.post('/load-test-evictions', authenticateAdminToken, async (_req, res) => {
 	try {
 		console.log('Loading test evictions');
 		await conditionallyPopulateTestUsers();
@@ -33,7 +33,7 @@ router.get('/load-test-evictions', authenticateAdminToken, async (_req, res) => 
 	}
 });
 
-router.get('/load-sample-data', authenticateAdminToken, async (_req, res) => {
+router.post('/load-sample-data', authenticateAdminToken, async (_req, res) => {
 	try {
 		console.log("Populating Sample Data");
 		await populateSampleUsers();
