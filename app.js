@@ -27,9 +27,19 @@ console.log("Configuring Express");
 
 app.use(logger('tiny'));
 app.use(requestMethods);
-app.use(cors({
+const originAllowList = [/https?:\/\/localhost(:\d{1,4})?/, /https:\/\/stonomo.com(:\d{1,4})?/]
+const corsOptions = {
 	credentials: true,
-}));
+	origin: originAllowList
+	//  function (origin, callback) {
+	// 	if (whitelist.indexOf(origin) !== -1 || !origin) {
+	// 		callback(null, true)
+	// 	} else {
+	// 		callback(new Error('Not allowed by CORS'))
+	// 	}
+	// }
+};
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
