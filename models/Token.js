@@ -1,27 +1,51 @@
 import mongoose from 'mongoose';
-import { getUserByEmail, getUserById } from './User.js';
+import {
+	getUserByEmail,
+	getUserById
+} from './User.js';
 import bcrypt from 'bcrypt';
 import { sendEmail } from '../lib/sendEmail.js';
 
 const bcryptSalt = process.env.BCRYPT_SALT;
 const clientUrl = process.env.CLIENT_URL;
 
-const resetTokenSchema = new mongoose.Schema({
+const tokenSchema = new mongoose.Schema({
 	user: {
 		type: mongoose.ObjectId,
 		ref: 'User',
 		required: true,
 		index: true
 	},
-	token: {
+	tokenType: {
 		type: String,
 		required: true
 	},
+	tokenFamily: {
+		type: String,
+		required: true
+	},
+	nonce: {
+		type: String,
+		required: true
+	}
 }, { timestamps: true });
 
-resetTokenSchema.index({ "createdAt": 1 }, { expireAfterSeconds: 60 * 60 })
+tokenSchema.index({ "createdAt": 1 }, { expireAfterSeconds: 60 * 60 })
 
-export const ResetToken = mongoose.model('Token', resetTokenSchema);
+export const Token = mongoose.model('Token', tokenSchema);
+
+export async function storeToken(user, tokenType, tokenFamily, nonce) {
+	try {
+		await Token.create({
+			user: user._id,
+			tokenType,
+			tokenFamily,
+			nonce
+		});
+	} catch (err) {
+		console.log(err)
+	}
+}
 
 export async function generatePasswordResetLink(userEmail) {
 	try {
@@ -29,14 +53,15 @@ export async function generatePasswordResetLink(userEmail) {
 		if (!user) throw new Error('User email not found');
 
 		// Delete any previous token so only most recent is valid
-		await ResetToken.findOneAndDelete({ userId: user._id });
+		await Token.findOneAndDelete({ user: user._id });
 
 		const resetToken = crypto.randomBytes(32).toString('base64url');
 		const hash = bcrypt.hash(resetToken, bcryptSalt);
 
-		await new ResetToken({
-			userId: user._id,
-			token: hash
+		await new Token({
+			user: user._id,
+			tokenType: 'resetToken',
+			nonce: hash
 		}).save();
 
 		// send email with plaintext token
@@ -60,13 +85,16 @@ export async function resetPassword(userId, token, password) {
 		const hash = bcrypt.hash(password);
 
 		//find resetToken
-		const resetToken = ResetToken.findOne({ userId });
+		const resetToken = Token.findOne({
+			userId,
+			tokenType: 'resetToken'
+		});
 
 		if (!resetToken) {
 			throw new Error('Invalid or expired password reset token');
 		}
 
-		const isValid = bcrypt.compare(token, resetToken.token);
+		const isValid = bcrypt.compare(token, resetToken.nonce);
 
 		if (!isValid) {
 			throw new Error('Invalid or expired password reset token');

@@ -7,21 +7,10 @@ import { getTokenFromRequest, getUseridFromToken, getUsernameFromToken } from '.
 var router = Router();
 const saltRounds = Number(process.env.BCRYPT_SALT);
 
-router.get('/get-free-searches', authenticateToken, async (req, res) => {
-	try {
-		const userId = getUseridFromToken(getTokenFromRequest(req));
-		var user = await getUserById(userId);
-		res.send(JSON.stringify(user.freeSearches));
-	} catch (err) {
-		res.status(404);
-		res.send({ error: 'User does not exist', message: err.message })
-	}
-});
-
 /* GET user's own user record. */
-router.get('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
 	try {
-		const userId = getUseridFromToken(getTokenFromRequest(req));
+		const userId = getTokenFromRequest(req).id;
 		var user = await getUserById(userId);
 		res.send(user);
 	} catch (err) {
@@ -31,8 +20,19 @@ router.get('/', authenticateToken, async (req, res) => {
 
 });
 
+router.post('/get-free-searches', authenticateToken, async (req, res) => {
+	try {
+		const userId = getTokenFromRequest(req).id;
+		var user = await getUserById(userId);
+		res.send(JSON.stringify(user.freeSearches));
+	} catch (err) {
+		res.status(404);
+		res.send({ error: 'User does not exist', message: err.message })
+	}
+});
+
 /* GET user record. */
-router.get('/:userId', authenticateToken, async (req, res) => {
+router.post('/:userId', authenticateToken, async (req, res) => {
 	try {
 		const userId = req.params.userId;
 		var user = await getUserById(userId);

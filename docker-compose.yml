@@ -13,6 +13,7 @@ services:
         ipv4_address: 172.0.0.3
     secrets:
       - token_secret
+      - refresh_token_secret
 
   stonomo-database:
     container_name: stonomo_db
@@ -34,3 +35,5 @@ networks:
 secrets:
   token_secret:
     file: secrets/token_secret.txt
+  refresh_token_secret:
+    file: secrets/refresh_token_secret.txt

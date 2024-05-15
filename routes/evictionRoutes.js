@@ -18,48 +18,6 @@ import { addUserFreeSearches } from '../models/User.js';
 
 let router = Router();
 
-/* GET eviction listings by reporting user. */
-router.get('/by-user', authenticateToken, async (req, res) => {
-	try {
-		const userId = getUseridFromToken(getTokenFromRequest(req))
-		const evictions = await getEvictionsByUser(userId);
-		res.send(evictions);
-	} catch (err) {
-		console.error(err.message)
-		res.status(500);
-		res.send({ error: 'Eviction record does not exist' });
-	}
-
-});
-
-/* GET eviction listing. */
-router.get('/:id', authenticateToken, async (req, res) => {
-	try {
-		const evictionId = req.params.id
-		var eviction = await getEvictionByIdLean(evictionId);
-		res.send(eviction);
-	} catch (err) {
-		console.error(err.message)
-		res.status(404);
-		res.send({ error: 'Eviction record does not exist' });
-	}
-
-});
-
-/* GET confirm eviction listing. */
-router.get('/confirm/:id', authenticateToken, async (req, res) => {
-	try {
-		const evictionId = req.params.id
-		var eviction = await getConfirmEvictionByIdLean(evictionId);
-		res.send(eviction);
-	} catch (err) {
-		console.error(err.message)
-		res.status(404);
-		res.send({ error: 'Eviction record does not exist' });
-	}
-
-});
-
 /* POST - create eviction */
 router.post('/', authenticateToken, async (req, res) => {
 	try {
@@ -84,7 +42,21 @@ router.post('/', authenticateToken, async (req, res) => {
 		res.status(500);
 		res.send({ error: 'Internal Server Error ' + err.message });
 	}
-})
+});
+
+/* GET eviction listings by reporting user. */
+router.post('/by-user', authenticateToken, async (req, res) => {
+	try {
+		const userId = getUseridFromToken(getTokenFromRequest(req))
+		const evictions = await getEvictionsByUser(userId);
+		res.send(evictions);
+	} catch (err) {
+		console.error(err.message)
+		res.status(500);
+		res.send({ error: 'Eviction record does not exist' });
+	}
+
+});
 
 /* POST - create eviction */
 router.post('/confirm', authenticateToken, async (req, res) => {
@@ -106,6 +78,34 @@ router.post('/confirm', authenticateToken, async (req, res) => {
 		res.send({ error: 'Internal Server Error.' });
 	}
 })
+
+/* GET confirm eviction listing. */
+router.post('/confirm/:id', authenticateToken, async (req, res) => {
+	try {
+		const evictionId = req.params.id
+		var eviction = await getConfirmEvictionByIdLean(evictionId);
+		res.send(eviction);
+	} catch (err) {
+		console.error(err.message)
+		res.status(404);
+		res.send({ error: 'Eviction record does not exist' });
+	}
+
+});
+
+/* GET eviction listing. */
+router.post('/:id', authenticateToken, async (req, res) => {
+	try {
+		const evictionId = req.params.id
+		var eviction = await getEvictionByIdLean(evictionId);
+		res.send(eviction);
+	} catch (err) {
+		console.error(err.message)
+		res.status(404);
+		res.send({ error: 'Eviction record does not exist' });
+	}
+
+});
 
 /* PATCH - update eviction (admin only) */
 // TODO: add check to ensure eviction.user is defined and matches req.body.user
