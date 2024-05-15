@@ -32,10 +32,10 @@ router.post('/login', async (req, res) => {
 		const tokenFamily = generateNonce();
 		const nonce = generateNonce();
 
-		const authToken = await generateAccessToken(user, tokenFamily, nonce);
+		const accessToken = await generateAccessToken(user, tokenFamily, nonce);
 		const refreshToken = await generateRefreshToken(user, tokenFamily, nonce);
 
-		res.json({ refreshToken, authToken });
+		res.json({ refreshToken, accessToken });
 	} catch (err) {
 		res.status(401).send(err.message);
 	}
