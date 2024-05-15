@@ -28,7 +28,6 @@ console.log("Configuring Express");
 app.use(logger('tiny'));
 app.use(requestMethods);
 app.use(cors({
-	origin: [/^http:\/\/localhost(:\d{1,4})?/, 'https://stonomo.com'],
 	credentials: true,
 }));
 
@@ -91,9 +90,5 @@ const server = createServer(app);
 server.listen(port || 3000, () => {
 	console.log("Server listening on port:", port);
 });
-
-// while (mongoose.connection.readyState !== 1) {
-// 	//TODO: set health to bad db connection-itis
-// }
 
 export default server;
