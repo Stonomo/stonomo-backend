@@ -18,22 +18,17 @@ router.post('/login', async (req, res) => {
 
 		// Compare passwords
 		const result = await bcrypt.compare(req.body.password, user.passHash);
-		if (result) {
-			const authToken = await generateAccessToken(user);
-			const refreshToken = await generateRefreshToken(user);
-
-			res.cookie('stonomoToken', authToken, {
-				secure: true,
-				path: '/',
-				httpOnly: true,
-				signed: true,
-				sameSite: 'none',
-				maxAge: 1000 * 60 * 60 // One hour TTL
-			});
-
-			return res.json(refreshToken);
+		if (!result) {
+			return res.status(401).json({ message: "Invalid Credentials" });
 		}
-		return res.status(401).json({ message: "Invalid Credentials" });
+
+		const tokenFamily = generateNonce();
+		const nonce = generateNonce();
+
+		const authToken = await generateAccessToken(user, tokenFamily, nonce);
+		const refreshToken = await generateRefreshToken(user, tokenFamily, nonce);
+
+		res.json({ refreshToken, authToken });
 	} catch (err) {
 		res.status(401).send(err.message);
 	}
