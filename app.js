@@ -27,7 +27,7 @@ console.log("Configuring Express");
 
 app.use(logger('tiny'));
 app.use(requestMethods);
-const originAllowList = [/https?:\/\/localhost(:\d{1,4})?/, /https:\/\/stonomo.com(:\d{1,4})?/]
+const originAllowList = [/https?:\/\/localhost(:\d{1,4})?/, /https:\/\/stonomo.com/]
 const corsOptions = {
 	credentials: true,
 	origin: originAllowList
