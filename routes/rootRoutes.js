@@ -44,7 +44,6 @@ router.post('/login', async (req, res) => {
 // Refresh token route
 router.post('/refresh-token', async (req, res) => {
 	const { refreshToken } = req.body;
-	let createNewTokenFamily = false
 
 	if (!refreshToken) {
 		return res.status(403).json({ message: 'Refresh token is required' });
@@ -68,7 +67,6 @@ router.post('/refresh-token', async (req, res) => {
 			// Invalidate all tokens of the same family
 			await Token.deleteMany({ tokenFamily });
 			return res.status(403).json({ message: 'Invalid nonce. Token family invalidated.' });
-			createNewTokenFamily = true;
 		}
 
 		// Check if the existing token is the most recent one
@@ -78,20 +76,14 @@ router.post('/refresh-token', async (req, res) => {
 			// Invalidate all tokens of the same family
 			await Token.deleteMany({ tokenFamily });
 			return res.status(403).json({ message: 'Existing token is not the most recent one. Token family invalidated.' });
-			createNewTokenFamily = true;
-		}
-
-		let newTokenFamily = tokenFamily;
-		if (createNewTokenFamily) {
-			newTokenFamily = generateNonce();
 		}
 
 		const user = await getUserByIdLean(id);
 
 		// Generate new access and refresh tokens with a new nonce
 		const newNonce = generateNonce();
-		const newAccessToken = await generateAccessToken(user, newTokenFamily, newNonce);
-		const newRefreshToken = await generateRefreshToken(user, newTokenFamily, newNonce);
+		const newAccessToken = await generateAccessToken(user, tokenFamily, newNonce);
+		const newRefreshToken = await generateRefreshToken(user, tokenFamily, newNonce);
 
 		res.json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
 	});
