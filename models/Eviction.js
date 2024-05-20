@@ -183,7 +183,7 @@ export async function searchForEviction(searchName, searchPhone, searchEmail) {
 					'$cond': {
 						'if': {
 							'$eq': [
-								'$tenantName', searchNameLower
+								'$tenantNameLower', searchNameLower
 							]
 						},
 						'then': 1,
